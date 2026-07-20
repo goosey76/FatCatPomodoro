@@ -1,0 +1,12 @@
+.build/
+.DS_Store
+.claude/
+.refact/
+.swiftpm/
+*.app/
+FatCatPomodoro.app/
+IslandBar.app/
+Package.resolved
+
+# Large binary assets — keep local, not tracked in git
+*.mov
