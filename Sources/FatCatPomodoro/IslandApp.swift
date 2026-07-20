@@ -194,7 +194,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 catWin.ignoresMouseEvents = true
                 catWin.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
                 catWin.contentView = NSHostingView(
-                    rootView: LoopingVideoPlayer(videoName: "cleancat", videoType: "mov").ignoresSafeArea()
+                    rootView: LoopingVideoPlayer(videoName: "cleancat", videoType: "mp4").ignoresSafeArea()
                 )
                 self.fullScreenWindow = catWin
 

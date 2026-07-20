@@ -8,5 +8,5 @@ FatCatPomodoro.app/
 IslandBar.app/
 Package.resolved
 
-# Large binary assets — keep local, not tracked in git
+# Original ProRes source — replaced by cleancat.mp4 (13 MB H.265)
 *.mov
