@@ -704,7 +704,7 @@ struct IslandView: View {
                                                 }
                                             }
                                             .padding(.leading, 9)
-                                            .padding(.trailing, 14)
+                                            .padding(.trailing, 42)
                                             .padding(.vertical, 5)
                                             .contentShape(Rectangle())
                                         }
