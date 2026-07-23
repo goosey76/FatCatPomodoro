@@ -714,7 +714,7 @@ struct IslandView: View {
                                             if isHovering {
                                                 // 120 ms gate — quick passes don't trigger the layout shift
                                                 checkmarkHoverTask = Task {
-                                                    try? await Task.sleep(nanoseconds: 120_000_000)
+                                                    try? await Task.sleep(nanoseconds: 500_000_000)
                                                     guard !Task.isCancelled else { return }
                                                     await MainActor.run {
                                                         withAnimation(.easeInOut(duration: 0.2)) {
