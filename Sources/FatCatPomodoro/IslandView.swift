@@ -711,6 +711,9 @@ struct IslandView: View {
                                         .onHover { isHovering in
                                             withAnimation(.easeInOut(duration: 0.15)) {
                                                 hoveredCheckmarkTask = isHovering ? title : nil
+                                                // Keep chip "hovered" so text label doesn't flicker
+                                                // back to its resting state when entering the checkmark.
+                                                if isHovering { hoveredTask = title }
                                             }
                                         }
 
@@ -744,7 +747,13 @@ struct IslandView: View {
                                     )
                                     .onHover { isHovering in
                                         withAnimation(.easeInOut(duration: 0.15)) {
-                                            hoveredTask = isHovering ? title : nil
+                                            if isHovering {
+                                                hoveredTask = title
+                                            } else if hoveredCheckmarkTask != title {
+                                                // Only clear when leaving the whole chip,
+                                                // not when transitioning to the checkmark button.
+                                                hoveredTask = nil
+                                            }
                                         }
                                     }
                                 }

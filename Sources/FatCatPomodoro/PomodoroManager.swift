@@ -230,9 +230,12 @@ class PomodoroManager: ObservableObject {
             JarviManager.shared.sendEvent(type: "TASK_COMPLETED", sessionId: UUID().uuidString, title: title, list: targetTodoList)
         }
         
-        if enableReminders || JarviManager.shared.isLinked {
-            fetchReminders() // Refresh list from selected source
+        if enableReminders {
+            fetchReminders() // Refresh Apple Reminders (local, safe to re-fetch immediately)
         }
+        // Jarvi todos: skip immediate re-fetch. The local removal above is already correct,
+        // and an instant re-fetch races with completeGoogleTask — returning stale or empty
+        // data that wipes the whole list.
     }
     
     func completeTask(_ title: String) {
