@@ -16,7 +16,6 @@ struct IslandView: View {
     @State private var displayMode: PomodoroSessionType = .work
     @State private var hoveredTask: String? = nil
     @State private var hoveredCheckmarkTask: String? = nil
-    @State private var checkmarkHoverTask: Task<Void, Never>? = nil
 
     // Hold to Quit state
     @State private var quitHoldProgress: CGFloat = 0
@@ -686,50 +685,43 @@ struct IslandView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 8) {
                                 ForEach(pomodoroManager.recentTasks.prefix(8), id: \.self) { title in
-                                    HStack(spacing: 8) {
+                                    HStack(spacing: 0) {
+
+                                        // LEFT ZONE — mark complete
                                         Button {
-                                            withAnimation {
-                                                pomodoroManager.completeTask(title)
-                                            }
+                                            withAnimation { pomodoroManager.completeTask(title) }
                                         } label: {
                                             HStack(spacing: 4) {
                                                 Image(systemName: hoveredCheckmarkTask == title ? "checkmark.circle.fill" : "circle")
-                                                    .font(.system(size: 13, weight: hoveredCheckmarkTask == title ? .bold : .semibold))
-                                                    .foregroundColor(hoveredCheckmarkTask == title ? .green : .white.opacity(0.45))
-                                                
+                                                    .font(.system(size: 12, weight: hoveredCheckmarkTask == title ? .bold : .semibold))
+                                                    .foregroundColor(hoveredCheckmarkTask == title ? .green : .white.opacity(0.35))
                                                 if hoveredCheckmarkTask == title {
-                                                    Text("Mark complete")
+                                                    Text("Done")
                                                         .font(.system(size: 9, weight: .bold, design: .rounded))
                                                         .foregroundColor(.green)
-                                                        .transition(.opacity)
+                                                        .transition(.opacity.combined(with: .move(edge: .trailing)))
                                                 }
                                             }
-                                            .padding(.vertical, 3)
+                                            .padding(.leading, 9)
+                                            .padding(.trailing, 7)
+                                            .padding(.vertical, 5)
                                             .contentShape(Rectangle())
                                         }
                                         .buttonStyle(PlainButtonStyle())
                                         .help("Mark complete")
                                         .onHover { isHovering in
-                                            checkmarkHoverTask?.cancel()
-                                            if isHovering {
-                                                // 120 ms gate — quick passes don't trigger the layout shift
-                                                checkmarkHoverTask = Task {
-                                                    try? await Task.sleep(nanoseconds: 500_000_000)
-                                                    guard !Task.isCancelled else { return }
-                                                    await MainActor.run {
-                                                        withAnimation(.easeInOut(duration: 0.2)) {
-                                                            hoveredCheckmarkTask = title
-                                                            hoveredTask = title
-                                                        }
-                                                    }
-                                                }
-                                            } else {
-                                                withAnimation(.easeInOut(duration: 0.2)) {
-                                                    hoveredCheckmarkTask = nil
-                                                }
+                                            withAnimation(.easeInOut(duration: 0.18)) {
+                                                hoveredCheckmarkTask = isHovering ? title : nil
                                             }
                                         }
 
+                                        // Subtle divider between zones
+                                        Rectangle()
+                                            .fill(Color.white.opacity(0.08))
+                                            .frame(width: 1)
+                                            .padding(.vertical, 5)
+
+                                        // RIGHT ZONE — start session
                                         Button {
                                             pomodoroManager.currentTask = title
                                             pomodoroManager.saveTaskToRecent()
@@ -740,35 +732,32 @@ struct IslandView: View {
                                                 pomodoroManager.start()
                                             }
                                         } label: {
-                                            Text((hoveredTask == title && hoveredCheckmarkTask != title) ? "▶ Start session of \(title)" : title)
-                                                .font(.system(size: 10, weight: (hoveredTask == title && hoveredCheckmarkTask != title) ? .bold : .medium, design: .rounded))
-                                                .foregroundColor((hoveredTask == title && hoveredCheckmarkTask != title) ? .orange : (pomodoroManager.currentTask == title ? .orange : .white.opacity(0.7)))
+                                            Text(title)
+                                                .font(.system(size: 10, weight: .medium, design: .rounded))
+                                                .foregroundColor(
+                                                    hoveredTask == title ? .orange :
+                                                    (pomodoroManager.currentTask == title ? .orange : .white.opacity(0.7))
+                                                )
                                                 .lineLimit(1)
+                                                .padding(.leading, 7)
+                                                .padding(.trailing, 10)
+                                                .padding(.vertical, 5)
                                                 .contentShape(Rectangle())
                                         }
                                         .buttonStyle(PlainButtonStyle())
                                         .help("Start session of \(title)")
+                                        .onHover { isHovering in
+                                            withAnimation(.easeInOut(duration: 0.15)) {
+                                                hoveredTask = isHovering ? title : nil
+                                            }
+                                        }
                                     }
-                                    .padding(.leading, 8)
-                                    .padding(.trailing, 10)
-                                    .padding(.vertical, 5)
                                     .background(pomodoroManager.currentTask == title ? Color.orange.opacity(0.15) : Color.white.opacity(0.06))
                                     .clipShape(Capsule())
                                     .overlay(
                                         Capsule()
                                             .stroke(pomodoroManager.currentTask == title ? Color.orange.opacity(0.4) : Color.white.opacity(0.05), lineWidth: 1)
                                     )
-                                    .onHover { isHovering in
-                                        withAnimation(.easeInOut(duration: 0.2)) {
-                                            if isHovering {
-                                                hoveredTask = title
-                                            } else if hoveredCheckmarkTask != title {
-                                                // Only clear when leaving the whole chip,
-                                                // not when transitioning to the checkmark button.
-                                                hoveredTask = nil
-                                            }
-                                        }
-                                    }
                                 }
                             }
                             .padding(.horizontal, 20)
