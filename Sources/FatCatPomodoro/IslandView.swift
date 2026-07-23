@@ -16,6 +16,7 @@ struct IslandView: View {
     @State private var displayMode: PomodoroSessionType = .work
     @State private var hoveredTask: String? = nil
     @State private var hoveredCheckmarkTask: String? = nil
+    @State private var checkmarkHoverTask: Task<Void, Never>? = nil
 
     // Hold to Quit state
     @State private var quitHoldProgress: CGFloat = 0
@@ -709,11 +710,23 @@ struct IslandView: View {
                                         .buttonStyle(PlainButtonStyle())
                                         .help("Mark complete")
                                         .onHover { isHovering in
-                                            withAnimation(.easeInOut(duration: 0.15)) {
-                                                hoveredCheckmarkTask = isHovering ? title : nil
-                                                // Keep chip "hovered" so text label doesn't flicker
-                                                // back to its resting state when entering the checkmark.
-                                                if isHovering { hoveredTask = title }
+                                            checkmarkHoverTask?.cancel()
+                                            if isHovering {
+                                                // 120 ms gate — quick passes don't trigger the layout shift
+                                                checkmarkHoverTask = Task {
+                                                    try? await Task.sleep(nanoseconds: 120_000_000)
+                                                    guard !Task.isCancelled else { return }
+                                                    await MainActor.run {
+                                                        withAnimation(.easeInOut(duration: 0.2)) {
+                                                            hoveredCheckmarkTask = title
+                                                            hoveredTask = title
+                                                        }
+                                                    }
+                                                }
+                                            } else {
+                                                withAnimation(.easeInOut(duration: 0.2)) {
+                                                    hoveredCheckmarkTask = nil
+                                                }
                                             }
                                         }
 
@@ -746,7 +759,7 @@ struct IslandView: View {
                                             .stroke(pomodoroManager.currentTask == title ? Color.orange.opacity(0.4) : Color.white.opacity(0.05), lineWidth: 1)
                                     )
                                     .onHover { isHovering in
-                                        withAnimation(.easeInOut(duration: 0.15)) {
+                                        withAnimation(.easeInOut(duration: 0.2)) {
                                             if isHovering {
                                                 hoveredTask = title
                                             } else if hoveredCheckmarkTask != title {
