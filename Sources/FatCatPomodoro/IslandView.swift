@@ -16,6 +16,7 @@ struct IslandView: View {
     @State private var displayMode: PomodoroSessionType = .work
     @State private var hoveredTask: String? = nil
     @State private var hoveredCheckmarkTask: String? = nil
+    @State private var startSessionHoverTask: Task<Void, Never>? = nil
 
     // Hold to Quit state
     @State private var quitHoldProgress: CGFloat = 0
@@ -703,7 +704,7 @@ struct IslandView: View {
                                                 }
                                             }
                                             .padding(.leading, 9)
-                                            .padding(.trailing, 7)
+                                            .padding(.trailing, 14)
                                             .padding(.vertical, 5)
                                             .contentShape(Rectangle())
                                         }
@@ -747,8 +748,21 @@ struct IslandView: View {
                                         .buttonStyle(PlainButtonStyle())
                                         .help("Start session of \(title)")
                                         .onHover { isHovering in
-                                            withAnimation(.easeInOut(duration: 0.15)) {
-                                                hoveredTask = isHovering ? title : nil
+                                            startSessionHoverTask?.cancel()
+                                            if isHovering {
+                                                startSessionHoverTask = Task {
+                                                    try? await Task.sleep(nanoseconds: 80_000_000)
+                                                    guard !Task.isCancelled else { return }
+                                                    await MainActor.run {
+                                                        withAnimation(.easeInOut(duration: 0.15)) {
+                                                            hoveredTask = title
+                                                        }
+                                                    }
+                                                }
+                                            } else {
+                                                withAnimation(.easeInOut(duration: 0.15)) {
+                                                    hoveredTask = nil
+                                                }
                                             }
                                         }
                                     }
