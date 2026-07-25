@@ -54,16 +54,20 @@ struct HorizontalDialView: View {
                     .scrollTargetBehavior(.viewAligned)
                     .scrollPosition(id: $internalId)
                     .overlay(alignment: .center) {
+                        let current = internalId ?? value
+                        let onMajor = current % 5 == 0
                         VStack(spacing: 4) {
-                            Text("\(internalId ?? value)")
+                            Text("\(current)")
                                 .font(.system(size: 18, weight: .black, design: .rounded))
                                 .foregroundColor(.orange)
                                 .shadow(color: Color.orange.opacity(0.4), radius: 6)
                                 .offset(y: -18)
-                            
+
                             Capsule()
                                 .fill(Color.orange)
                                 .frame(width: 2, height: majorTickHeight + 8)
+                                .opacity(onMajor ? 0 : 1)
+                                .animation(.easeInOut(duration: 0.12), value: onMajor)
                         }
                         .offset(y: 6)
                     }
