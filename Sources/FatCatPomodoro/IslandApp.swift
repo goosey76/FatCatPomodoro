@@ -195,8 +195,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 catWin.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
                 // Use ProRes original (cleancat.mov, gitignored) if available — has alpha channel.
                 // Falls back to cleancat.mp4 (committed to git) when the large source isn't present.
-                let hasProRes = Bundle.main.path(forResource: "cleancat", ofType: "mov") != nil ||
-                    Bundle(for: AppDelegate.self).path(forResource: "cleancat", ofType: "mov") != nil
+                // Must check the SwiftPM sub-bundle (FatCatPomodoro_FatCatPomodoro) where resources live.
+                let swiftPMBundle: Bundle? = {
+                    if let url = Bundle.main.url(forResource: "FatCatPomodoro_FatCatPomodoro", withExtension: "bundle") {
+                        return Bundle(url: url)
+                    }
+                    return nil
+                }()
+                let hasProRes = Bundle.main.path(forResource: "cleancat", ofType: "mov") != nil
+                    || Bundle(for: AppDelegate.self).path(forResource: "cleancat", ofType: "mov") != nil
+                    || swiftPMBundle?.path(forResource: "cleancat", ofType: "mov") != nil
                 let (vidName, vidType) = hasProRes ? ("cleancat", "mov") : ("cleancat", "mp4")
                 catWin.contentView = NSHostingView(
                     rootView: LoopingVideoPlayer(videoName: vidName, videoType: vidType).ignoresSafeArea()
