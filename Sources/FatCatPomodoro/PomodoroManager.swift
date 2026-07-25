@@ -366,11 +366,9 @@ class PomodoroManager: ObservableObject {
                 saveTaskToRecent()
             }
             if dndAutoToggle { NotificationManager.shared.setDND(enabled: true) }
-            JarviManager.shared.sendEvent(type: "FLOW_START", sessionId: UUID().uuidString, title: currentTask, workMins: workDuration / 60, breakMins: breakDuration / 60)
             JarviManager.shared.sendFatcatEvent("FLOW_START", title: currentTask, workDurationMins: workDuration / 60, breakDurationMins: breakDuration / 60)
         } else {
             // It's a break
-            JarviManager.shared.sendEvent(type: "BREAK_START", sessionId: UUID().uuidString, title: "Break", workMins: workDuration / 60, breakMins: breakDuration / 60)
             JarviManager.shared.sendFatcatEvent("BREAK_START")
         }
         
