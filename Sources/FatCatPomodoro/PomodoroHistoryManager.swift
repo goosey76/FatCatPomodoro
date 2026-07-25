@@ -122,7 +122,7 @@ class PomodoroHistoryManager: ObservableObject {
     }
     
     func exportCSVToDesktop() {
-        let fileName = "IslandBar_FocusHistory.csv"
+        let fileName = "FatCatPomodoro_FocusHistory.csv"
         let fm = FileManager.default
         guard let desktopURL = fm.urls(for: .desktopDirectory, in: .userDomainMask).first else { return }
         let fileURL = desktopURL.appendingPathComponent(fileName)

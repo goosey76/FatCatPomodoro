@@ -39,7 +39,7 @@ class JarviManager: ObservableObject {
     }
     
     private let baseURL = "https://asifthatworks.com/api/v1"
-    private let keychainService = "com.islandbar.jarvi"
+    private let keychainService = "com.fatcat.jarvi"
 
     private var deviceId: String {
         if let stored = UserDefaults.standard.string(forKey: "jarvi_device_id") { return stored }
@@ -185,12 +185,26 @@ class JarviManager: ObservableObject {
             kSecReturnData as String: kCFBooleanTrue!,
             kSecMatchLimit as String: kSecMatchLimitOne
         ]
-        
         var dataTypeRef: AnyObject?
-        let status = SecItemCopyMatching(query as CFDictionary, &dataTypeRef)
-        
-        if status == errSecSuccess, let data = dataTypeRef as? Data {
-            return String(data: data, encoding: .utf8)
+        if SecItemCopyMatching(query as CFDictionary, &dataTypeRef) == errSecSuccess,
+           let data = dataTypeRef as? Data,
+           let token = String(data: data, encoding: .utf8) {
+            return token
+        }
+        // One-time migration from old "com.islandbar.jarvi" keychain entry
+        let legacyQuery: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: "com.islandbar.jarvi",
+            kSecReturnData as String: kCFBooleanTrue!,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+        var legacyRef: AnyObject?
+        if SecItemCopyMatching(legacyQuery as CFDictionary, &legacyRef) == errSecSuccess,
+           let data = legacyRef as? Data,
+           let token = String(data: data, encoding: .utf8), !token.isEmpty {
+            saveTokenToKeychain(token) // write under new service key
+            SecItemDelete(legacyQuery as CFDictionary) // remove old entry
+            return token
         }
         return nil
     }
@@ -284,7 +298,7 @@ class JarviManager: ObservableObject {
     }
     
     func handleDeepLink(_ url: URL) {
-        guard url.scheme == "islandbar" else { return }
+        guard url.scheme == "fatcatpomodoro" else { return }
         
         let host = url.host ?? ""
         let path = url.path

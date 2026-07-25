@@ -27,7 +27,7 @@
             <string>com.fatcat.FatCatPomodoro</string>
             <key>CFBundleURLSchemes</key>
             <array>
-                <string>islandbar</string>
+                <string>fatcatpomodoro</string>
             </array>
         </dict>
     </array>

@@ -4,8 +4,6 @@
 .refact/
 .swiftpm/
 *.app/
-FatCatPomodoro.app/
-IslandBar.app/
 Package.resolved
 
 # Large video files — generate locally from cleancat.mov (ProRes source):

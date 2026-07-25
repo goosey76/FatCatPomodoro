@@ -1,11 +1,11 @@
-# 🐈‍⬛ IslandBar (FatCatPomodoroIsland) — Detailed Project Documentation
+# 🐈‍⬛ FatCatPomodoro — Detailed Project Documentation
 ### 📅 Date: Saturday, July 11, 2026
 ### 🌐 Integration Partner: *Jarvi by AsIfThatWorks* & *SquatAlarm*
 
 ---
 
 ## 📖 Introduction & Core Concept
-**IslandBar** (commercially branded as **FatCatPomodoroIsland**) is an immersive, high-end macOS productivity utility designed specifically for modern Apple Silicon Macbooks. By utilizing a customized transparent window layering technique, the app transforms the physical black bezel notch of the MacBook screen into an interactive, highly responsive, and beautifully animated **"Dynamic Island" Focus Suite**.
+**FatCatPomodoro** is an immersive, high-end macOS productivity utility designed specifically for modern Apple Silicon Macbooks. By utilizing a customized transparent window layering technique, the app transforms the physical black bezel notch of the MacBook screen into an interactive, highly responsive, and beautifully animated **"Dynamic Island" Focus Suite**.
 
 The app is built from the ground up to follow **Offline-First** and **B2C-Scalable** architectures, integrating seamlessly with your default calendar and reminder systems locally, while also acting as an interactive bridge to the **Jarvi by AsIfThatWorks** executive RPG cloud platform and the physical **SquatAlarm** fitness dispatcher.
 
@@ -53,8 +53,8 @@ The app acts as a real-time focus telemetry dispatcher, fully supporting the off
 *   **🚨 Real-Time Lifecycle States:** Fires webhooks to `/flow/event` for state changes, notably **`BREAK_START`**, which tells Jarvi to instantly trigger the physical **SquatAlarm** fitness exercises on your phone!
 
 ### 6️⃣ Native EventKit Sync (B2C Scaling Masterclass)
-*   Instead of complex, battery-intensive, and hard-to-maintain direct syncing clients for various calendar/task providers, IslandBar delegates cloud synchronization to macOS.
-*   By writing/reading directly to **Apple EventKit (`EKEventStore`)**, IslandBar gains instant bi-directional access to any calendars or tasks the user has connected to their Mac (iCloud, Google Tasks, Exchange, etc.). 
+*   Instead of complex, battery-intensive, and hard-to-maintain direct syncing clients for various calendar/task providers, FatCatPomodoro delegates cloud synchronization to macOS.
+*   By writing/reading directly to **Apple EventKit (`EKEventStore`)**, FatCatPomodoro gains instant bi-directional access to any calendars or tasks the user has connected to their Mac (iCloud, Google Tasks, Exchange, etc.). 
 *   **Calendar Selection:** Settings features a live picker listing all editable macOS calendars, letting you choose exactly where your **`FatCatFlow Session`** logs should be written.
 *   **Suggestion Chips:** Active to-dos are pulled automatically and displayed as scrollable capsule chips in the island, allowing **1-click focus loading and automatic completion**.
 
@@ -91,19 +91,19 @@ To compile and package the app manually inside the native `.app` bundle (ensurin
 swift build
 
 # 2. Package the app structure
-mkdir -p .build/IslandBar.app/Contents/MacOS
-mkdir -p .build/IslandBar.app/Contents/Resources
+mkdir -p .build/FatCatPomodoro.app/Contents/MacOS
+mkdir -p .build/FatCatPomodoro.app/Contents/Resources
 
 # 3. Copy files & plist
-cp .build/arm64-apple-macosx/debug/IslandBar .build/IslandBar.app/Contents/MacOS/
-cp Sources/IslandBar/Info.plist .build/IslandBar.app/Contents/
-cp -R .build/arm64-apple-macosx/debug/IslandBar_IslandBar.bundle .build/IslandBar.app/Contents/Resources/
+cp .build/arm64-apple-macosx/debug/FatCatPomodoro .build/FatCatPomodoro.app/Contents/MacOS/
+cp Sources/FatCatPomodoro/Info.plist .build/FatCatPomodoro.app/Contents/
+cp -R .build/arm64-apple-macosx/debug/FatCatPomodoro_FatCatPomodoro.bundle .build/FatCatPomodoro.app/Contents/Resources/
 
 # 4. Register the URL scheme with Launch Services
-/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f .build/IslandBar.app
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f .build/FatCatPomodoro.app
 
 # 5. Run the app
-open .build/IslandBar.app
+open .build/FatCatPomodoro.app
 ```
 
 ---

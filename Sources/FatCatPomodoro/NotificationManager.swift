@@ -21,7 +21,7 @@ class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
         }
     }
 
-    // Ensure notifications appear even if IslandBar is the foreground/active app
+    // Ensure notifications appear even if FatCatPomodoro is the foreground/active app
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.banner, .sound])
     }

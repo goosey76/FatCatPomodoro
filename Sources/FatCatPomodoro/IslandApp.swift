@@ -10,7 +10,7 @@ struct IslandApp: App {
         Settings {
             EmptyView()
         }
-        .handlesExternalEvents(matching: Set(arrayLiteral: "islandbar"))
+        .handlesExternalEvents(matching: Set(arrayLiteral: "fatcatpomodoro"))
     }
 }
 
