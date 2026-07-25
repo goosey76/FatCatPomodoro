@@ -193,8 +193,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 catWin.hasShadow = false
                 catWin.ignoresMouseEvents = true
                 catWin.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+                // Prefer HEVC-with-alpha version (transparent background); fall back to MP4
+                let hasAlphaVideo = Bundle.main.path(forResource: "cleancat_hevc", ofType: "mov") != nil ||
+                    Bundle(for: AppDelegate.self).path(forResource: "cleancat_hevc", ofType: "mov") != nil
+                let (vidName, vidType) = hasAlphaVideo ? ("cleancat_hevc", "mov") : ("cleancat", "mp4")
                 catWin.contentView = NSHostingView(
-                    rootView: LoopingVideoPlayer(videoName: "cleancat", videoType: "mp4").ignoresSafeArea()
+                    rootView: LoopingVideoPlayer(videoName: vidName, videoType: vidType).ignoresSafeArea()
                 )
                 self.fullScreenWindow = catWin
 

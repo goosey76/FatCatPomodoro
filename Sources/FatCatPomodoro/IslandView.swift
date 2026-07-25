@@ -65,10 +65,10 @@ struct IslandView: View {
             return 192
         }
         if displayMode == .breakTime {
-            return 277
+            return 262
         }
         let hasRecent = !pomodoroManager.recentTasks.isEmpty
-        return hasRecent ? 277 : 252
+        return hasRecent ? 262 : 238
     }
     
     var body: some View {
@@ -503,7 +503,7 @@ struct IslandView: View {
                         )
                         .frame(width: 420, height: 72)
                         .id("work-dial")
-                        .padding(.top, 10)
+                        .padding(.top, 6)
                         .padding(.bottom, 0)
                         .transition(.asymmetric(insertion: .opacity.combined(with: .move(edge: .top)), removal: .opacity))
                     }
@@ -903,9 +903,9 @@ struct IslandView: View {
                     .clipShape(Capsule())
                 }
             }
-            .padding(.horizontal, 14)
+            .padding(.horizontal, 20)
             .padding(.top, 2)
-            .padding(.bottom, 14)
+            .padding(.bottom, 8)
         }
     }
 }

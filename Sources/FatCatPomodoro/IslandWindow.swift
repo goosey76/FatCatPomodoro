@@ -13,6 +13,12 @@ final class IslandHostingView<Content: View>: NSHostingView<Content> {
         NSSize(width: NSView.noIntrinsicMetric, height: NSView.noIntrinsicMetric)
     }
     override func invalidateIntrinsicContentSize() { /* intentionally empty */ }
+
+    // Prevent macOS from injecting notch safe-area insets into SwiftUI layout,
+    // which would push the compact pill a few pixels below the physical notch.
+    override var safeAreaInsets: NSEdgeInsets {
+        .init(top: 0, left: 0, bottom: 0, right: 0)
+    }
 }
 
 class IslandWindow: NSPanel {

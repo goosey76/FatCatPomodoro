@@ -8,7 +8,8 @@ FatCatPomodoro.app/
 IslandBar.app/
 Package.resolved
 
-# Original ProRes source — replaced by cleancat.mp4 (13 MB H.265)
+# Large video files — generate locally from cleancat.mov (ProRes source):
+#   swift /tmp/export_hevc_alpha.swift cleancat.mov cleancat_hevc.mov
 *.mov
 
 # Xcode user-specific files (keep xcodeproj itself tracked)
