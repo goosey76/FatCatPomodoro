@@ -58,8 +58,11 @@ struct IslandView: View {
 
     private func snapshotExpandedHeight() -> CGFloat {
         if pomodoroManager.isRunning || pomodoroManager.isPausedConfirming {
-            // Expand slightly to fit the bottom row content (cats, streak, cycle dots) fully
-            return pomodoroManager.sessionType == .work ? 202 : 192
+            if pomodoroManager.sessionType == .work {
+                // Chips are hidden during an active work session — compact height
+                return pomodoroManager.currentTask.isEmpty ? 202 : 172
+            }
+            return 192
         }
         if displayMode == .breakTime {
             return 277
