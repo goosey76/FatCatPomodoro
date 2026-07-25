@@ -704,7 +704,7 @@ struct IslandView: View {
                                                 }
                                             }
                                             .padding(.leading, 9)
-                                            .padding(.trailing, 42)
+                                            .padding(.trailing, 10)
                                             .padding(.vertical, 5)
                                             .contentShape(Rectangle())
                                         }
@@ -751,7 +751,7 @@ struct IslandView: View {
                                             startSessionHoverTask?.cancel()
                                             if isHovering {
                                                 startSessionHoverTask = Task {
-                                                    try? await Task.sleep(nanoseconds: 80_000_000)
+                                                    try? await Task.sleep(nanoseconds: 120_000_000)
                                                     guard !Task.isCancelled else { return }
                                                     await MainActor.run {
                                                         withAnimation(.easeInOut(duration: 0.15)) {
