@@ -809,7 +809,7 @@ struct IslandView: View {
                          Spacer().frame(height: 8)
                     }
                 }
-                .padding(.bottom, 8)
+                .padding(.bottom, 2)
             } else {
                 // Break — redesigned for parity with Work view
                 VStack(spacing: 0) {
@@ -904,7 +904,7 @@ struct IslandView: View {
                 }
             }
             .padding(.horizontal, 20)
-            .padding(.top, 2)
+            .padding(.top, 0)
             .padding(.bottom, 8)
         }
     }
