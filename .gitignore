@@ -10,3 +10,8 @@ Package.resolved
 
 # Original ProRes source — replaced by cleancat.mp4 (13 MB H.265)
 *.mov
+
+# Xcode user-specific files (keep xcodeproj itself tracked)
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+xcuserdata/

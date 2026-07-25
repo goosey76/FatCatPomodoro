@@ -1,0 +1,48 @@
+name: FatCatPomodoro
+options:
+  bundleIdPrefix: com.fatcat
+  deploymentTarget:
+    macOS: "14.0"
+  xcodeVersion: "16"
+  groupSortPosition: top
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    ENABLE_HARDENED_RUNTIME: YES
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: ""
+
+targets:
+  FatCatPomodoro:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources/FatCatPomodoro
+        excludes:
+          - Info.plist
+          - "**/.DS_Store"
+    resources:
+      - path: Sources/FatCatPomodoro/Resources
+        excludes:
+          - "*.mov"
+      - path: Sources/FatCatPomodoro/Assets.xcassets
+    info:
+      path: Sources/FatCatPomodoro/Info.plist
+      properties:
+        CFBundleIconName: AppIcon
+        NSPrincipalClass: NSApplication
+    entitlements:
+      path: Sources/FatCatPomodoro/FatCatPomodoro.entitlements
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.fatcat.FatCatPomodoro
+        PRODUCT_NAME: FatCatPomodoro
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_ENTITLEMENTS: Sources/FatCatPomodoro/FatCatPomodoro.entitlements
+        INFOPLIST_FILE: Sources/FatCatPomodoro/Info.plist
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/../Frameworks"

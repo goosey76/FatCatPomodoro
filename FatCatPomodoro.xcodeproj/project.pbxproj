@@ -1,0 +1,412 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		048040C9FBEC00B81EBC84E3 /* FatCatPomodoro.png in Resources */ = {isa = PBXBuildFile; fileRef = 307F6CF0DA98F37B2484353F /* FatCatPomodoro.png */; };
+		04A3847E94E9C214ADF44AD5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2D622D2297642149D28C78B3 /* Assets.xcassets */; };
+		0550010537B30B9F894E3FD7 /* IslandWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A22B0A8A4530AE0D837431E /* IslandWindow.swift */; };
+		28E73CFF771F8DA59731DBAA /* PomodoroActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BB235001561BCDC4E4D4443 /* PomodoroActivityView.swift */; };
+		2E929D283F5A9FFC282566C8 /* HorizontalDialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92B134928F0CEBC9159EE686 /* HorizontalDialView.swift */; };
+		33996C4A96408555681F7572 /* LaunchAtLoginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC20ECDAE162667D07E849A5 /* LaunchAtLoginManager.swift */; };
+		4C38B3F88CCA5BAA34774E27 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C07D47BD4E4C92F917C7BC01 /* PrivacyInfo.xcprivacy */; };
+		4D8EC5FCCB93D4696F3DB027 /* LoopingVideoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6FD14AF85AD2AB969F2868B /* LoopingVideoPlayer.swift */; };
+		56364E772C0937DD8D3A667A /* ScoreComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75A0ADE9D13D72676858658B /* ScoreComponents.swift */; };
+		5BECE23CDD0EF7E0EF3D8787 /* StreakManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E943987BCA84F4295CD4A21 /* StreakManager.swift */; };
+		65F78ED9FC103B682B0D024A /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D0046389FCCF046B98DAFF /* NotificationManager.swift */; };
+		6A762D248303C6AA156F49C0 /* PomodoroManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CCD5B3FDA2554BAD351E52D /* PomodoroManager.swift */; };
+		87B5128D1E9F19F12016ACCD /* JarviManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E77355591CD4EB2D54E99E0B /* JarviManager.swift */; };
+		88A030C03548011B13DCB0C2 /* CalendarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C4F4D2087F3B62B62CAEE8E /* CalendarManager.swift */; };
+		8A03926F61664AE53DF4E8FD /* IslandApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7886602B476919F5DDF7AF9 /* IslandApp.swift */; };
+		8E7CE494A18EB3763CAC7C97 /* cleancat.mov in Resources */ = {isa = PBXBuildFile; fileRef = FD397FD2A85D3BFD08CFF9B9 /* cleancat.mov */; };
+		A60B82101282B00FB2D341C5 /* face_cat.png in Resources */ = {isa = PBXBuildFile; fileRef = E8C3938410DDA599A8500A48 /* face_cat.png */; };
+		BD5516CB213C6D6208EB71C4 /* MusicManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F04F6B27857427ADCBE682 /* MusicManager.swift */; };
+		DBB7DA394124D8CF3D918435 /* PomodoroHistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB865F42C61E88E0BE5FE920 /* PomodoroHistoryManager.swift */; };
+		DF91BE094D04A9485CA27DF9 /* cleancat.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = FCA4C414B16FC2823FFAC70A /* cleancat.mp4 */; };
+		E1741B636F8E7F657A2608EA /* face_cat.icns in Resources */ = {isa = PBXBuildFile; fileRef = FA23ED5FB2DF87CD9D8E92E9 /* face_cat.icns */; };
+		E1E03247150D194044927FAC /* HotkeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EAA008E37BF38D6C8DDED49 /* HotkeyManager.swift */; };
+		EFEE9310EBCBE1A0F23495F3 /* IslandView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 156A6D0992E77D4FB864CD58 /* IslandView.swift */; };
+		F39AA9937DC664C66F8DC576 /* FatCatPomodoro.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4E20FC9D363525DBD639E468 /* FatCatPomodoro.icns */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		156A6D0992E77D4FB864CD58 /* IslandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandView.swift; sourceTree = "<group>"; };
+		1A22B0A8A4530AE0D837431E /* IslandWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandWindow.swift; sourceTree = "<group>"; };
+		2BB235001561BCDC4E4D4443 /* PomodoroActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroActivityView.swift; sourceTree = "<group>"; };
+		2D622D2297642149D28C78B3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		307F6CF0DA98F37B2484353F /* FatCatPomodoro.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = FatCatPomodoro.png; sourceTree = "<group>"; };
+		35D0046389FCCF046B98DAFF /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		3CCD5B3FDA2554BAD351E52D /* PomodoroManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroManager.swift; sourceTree = "<group>"; };
+		4E20FC9D363525DBD639E468 /* FatCatPomodoro.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = FatCatPomodoro.icns; sourceTree = "<group>"; };
+		55B6A920A53CC077B4F31671 /* FatCatPomodoro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FatCatPomodoro.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		75A0ADE9D13D72676858658B /* ScoreComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreComponents.swift; sourceTree = "<group>"; };
+		92B134928F0CEBC9159EE686 /* HorizontalDialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalDialView.swift; sourceTree = "<group>"; };
+		993DA40AEA4D90ACF1AECB95 /* FatCatPomodoro.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FatCatPomodoro.entitlements; sourceTree = "<group>"; };
+		9C4F4D2087F3B62B62CAEE8E /* CalendarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarManager.swift; sourceTree = "<group>"; };
+		9E943987BCA84F4295CD4A21 /* StreakManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakManager.swift; sourceTree = "<group>"; };
+		9EAA008E37BF38D6C8DDED49 /* HotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyManager.swift; sourceTree = "<group>"; };
+		BC20ECDAE162667D07E849A5 /* LaunchAtLoginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginManager.swift; sourceTree = "<group>"; };
+		C07D47BD4E4C92F917C7BC01 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		C6FD14AF85AD2AB969F2868B /* LoopingVideoPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopingVideoPlayer.swift; sourceTree = "<group>"; };
+		DB865F42C61E88E0BE5FE920 /* PomodoroHistoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroHistoryManager.swift; sourceTree = "<group>"; };
+		E77355591CD4EB2D54E99E0B /* JarviManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JarviManager.swift; sourceTree = "<group>"; };
+		E8C3938410DDA599A8500A48 /* face_cat.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = face_cat.png; sourceTree = "<group>"; };
+		F7886602B476919F5DDF7AF9 /* IslandApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandApp.swift; sourceTree = "<group>"; };
+		F8F04F6B27857427ADCBE682 /* MusicManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicManager.swift; sourceTree = "<group>"; };
+		FA23ED5FB2DF87CD9D8E92E9 /* face_cat.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = face_cat.icns; sourceTree = "<group>"; };
+		FCA4C414B16FC2823FFAC70A /* cleancat.mp4 */ = {isa = PBXFileReference; path = cleancat.mp4; sourceTree = "<group>"; };
+		FD397FD2A85D3BFD08CFF9B9 /* cleancat.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = cleancat.mov; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		3DB8C0ACC8EBEE3A6F7D20A3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				55B6A920A53CC077B4F31671 /* FatCatPomodoro.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		682F47F40A6145091E7908A8 = {
+			isa = PBXGroup;
+			children = (
+				991F1BBF27E714D35A34E9F6 /* FatCatPomodoro */,
+				3DB8C0ACC8EBEE3A6F7D20A3 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		7856C2C375E4990E7311519F /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				FD397FD2A85D3BFD08CFF9B9 /* cleancat.mov */,
+				FCA4C414B16FC2823FFAC70A /* cleancat.mp4 */,
+				FA23ED5FB2DF87CD9D8E92E9 /* face_cat.icns */,
+				E8C3938410DDA599A8500A48 /* face_cat.png */,
+				4E20FC9D363525DBD639E468 /* FatCatPomodoro.icns */,
+				307F6CF0DA98F37B2484353F /* FatCatPomodoro.png */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		8264B44D4166721E04D4662B /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				92B134928F0CEBC9159EE686 /* HorizontalDialView.swift */,
+				C6FD14AF85AD2AB969F2868B /* LoopingVideoPlayer.swift */,
+				2BB235001561BCDC4E4D4443 /* PomodoroActivityView.swift */,
+				75A0ADE9D13D72676858658B /* ScoreComponents.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		991F1BBF27E714D35A34E9F6 /* FatCatPomodoro */ = {
+			isa = PBXGroup;
+			children = (
+				7856C2C375E4990E7311519F /* Resources */,
+				8264B44D4166721E04D4662B /* Views */,
+				2D622D2297642149D28C78B3 /* Assets.xcassets */,
+				9C4F4D2087F3B62B62CAEE8E /* CalendarManager.swift */,
+				993DA40AEA4D90ACF1AECB95 /* FatCatPomodoro.entitlements */,
+				9EAA008E37BF38D6C8DDED49 /* HotkeyManager.swift */,
+				F7886602B476919F5DDF7AF9 /* IslandApp.swift */,
+				156A6D0992E77D4FB864CD58 /* IslandView.swift */,
+				1A22B0A8A4530AE0D837431E /* IslandWindow.swift */,
+				E77355591CD4EB2D54E99E0B /* JarviManager.swift */,
+				BC20ECDAE162667D07E849A5 /* LaunchAtLoginManager.swift */,
+				F8F04F6B27857427ADCBE682 /* MusicManager.swift */,
+				35D0046389FCCF046B98DAFF /* NotificationManager.swift */,
+				DB865F42C61E88E0BE5FE920 /* PomodoroHistoryManager.swift */,
+				3CCD5B3FDA2554BAD351E52D /* PomodoroManager.swift */,
+				C07D47BD4E4C92F917C7BC01 /* PrivacyInfo.xcprivacy */,
+				9E943987BCA84F4295CD4A21 /* StreakManager.swift */,
+			);
+			name = FatCatPomodoro;
+			path = Sources/FatCatPomodoro;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		59A39EC80D22F672920C73E2 /* FatCatPomodoro */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8FF1EE4B65ADDE7E47761393 /* Build configuration list for PBXNativeTarget "FatCatPomodoro" */;
+			buildPhases = (
+				728E8DB3B28AE3EF43A1E997 /* Sources */,
+				CEC213488F45BB63B5C55C12 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FatCatPomodoro;
+			packageProductDependencies = (
+			);
+			productName = FatCatPomodoro;
+			productReference = 55B6A920A53CC077B4F31671 /* FatCatPomodoro.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6C57339334EC7204D2E7E177 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					59A39EC80D22F672920C73E2 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 6F3683972763495FC6907CA6 /* Build configuration list for PBXProject "FatCatPomodoro" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 682F47F40A6145091E7908A8;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 3DB8C0ACC8EBEE3A6F7D20A3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				59A39EC80D22F672920C73E2 /* FatCatPomodoro */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CEC213488F45BB63B5C55C12 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				04A3847E94E9C214ADF44AD5 /* Assets.xcassets in Resources */,
+				F39AA9937DC664C66F8DC576 /* FatCatPomodoro.icns in Resources */,
+				048040C9FBEC00B81EBC84E3 /* FatCatPomodoro.png in Resources */,
+				4C38B3F88CCA5BAA34774E27 /* PrivacyInfo.xcprivacy in Resources */,
+				8E7CE494A18EB3763CAC7C97 /* cleancat.mov in Resources */,
+				DF91BE094D04A9485CA27DF9 /* cleancat.mp4 in Resources */,
+				E1741B636F8E7F657A2608EA /* face_cat.icns in Resources */,
+				A60B82101282B00FB2D341C5 /* face_cat.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		728E8DB3B28AE3EF43A1E997 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				88A030C03548011B13DCB0C2 /* CalendarManager.swift in Sources */,
+				2E929D283F5A9FFC282566C8 /* HorizontalDialView.swift in Sources */,
+				E1E03247150D194044927FAC /* HotkeyManager.swift in Sources */,
+				8A03926F61664AE53DF4E8FD /* IslandApp.swift in Sources */,
+				EFEE9310EBCBE1A0F23495F3 /* IslandView.swift in Sources */,
+				0550010537B30B9F894E3FD7 /* IslandWindow.swift in Sources */,
+				87B5128D1E9F19F12016ACCD /* JarviManager.swift in Sources */,
+				33996C4A96408555681F7572 /* LaunchAtLoginManager.swift in Sources */,
+				4D8EC5FCCB93D4696F3DB027 /* LoopingVideoPlayer.swift in Sources */,
+				BD5516CB213C6D6208EB71C4 /* MusicManager.swift in Sources */,
+				65F78ED9FC103B682B0D024A /* NotificationManager.swift in Sources */,
+				28E73CFF771F8DA59731DBAA /* PomodoroActivityView.swift in Sources */,
+				DBB7DA394124D8CF3D918435 /* PomodoroHistoryManager.swift in Sources */,
+				6A762D248303C6AA156F49C0 /* PomodoroManager.swift in Sources */,
+				56364E772C0937DD8D3A667A /* ScoreComponents.swift in Sources */,
+				5BECE23CDD0EF7E0EF3D8787 /* StreakManager.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		2DBE5872DCBB3E5A9B23DE6E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		69E8C627E120DE113F126B4D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sources/FatCatPomodoro/FatCatPomodoro.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = Sources/FatCatPomodoro/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fatcat.FatCatPomodoro;
+				PRODUCT_NAME = FatCatPomodoro;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		80FC6D07C3837D81831A7FC0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		DB178383C4641F7FAFC72C04 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sources/FatCatPomodoro/FatCatPomodoro.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = Sources/FatCatPomodoro/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fatcat.FatCatPomodoro;
+				PRODUCT_NAME = FatCatPomodoro;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6F3683972763495FC6907CA6 /* Build configuration list for PBXProject "FatCatPomodoro" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				80FC6D07C3837D81831A7FC0 /* Debug */,
+				2DBE5872DCBB3E5A9B23DE6E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		8FF1EE4B65ADDE7E47761393 /* Build configuration list for PBXNativeTarget "FatCatPomodoro" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				69E8C627E120DE113F126B4D /* Debug */,
+				DB178383C4641F7FAFC72C04 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6C57339334EC7204D2E7E177 /* Project object */;
+}
