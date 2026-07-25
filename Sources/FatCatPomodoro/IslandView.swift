@@ -681,11 +681,22 @@ struct IslandView: View {
                         }
                     }
 
-                    // Recent task chips (Always shown right under the display so user can select or Mark Complete anytime)
-                    if !pomodoroManager.recentTasks.isEmpty {
+                    // Task chips — hidden while a session is actively running (current task shown above)
+                    let isActiveSession = pomodoroManager.isRunning && pomodoroManager.sessionType == .work && !pomodoroManager.currentTask.isEmpty
+                    // Today's history titles first (quick re-run), then remaining fetched todos
+                    let todayTitles = PomodoroHistoryManager.shared.todaysHistory
+                        .map { $0.title }
+                        .filter { !$0.hasSuffix("(Partial)") }
+                        .reduce(into: [String]()) { acc, t in if !acc.contains(t) { acc.append(t) } }
+                    let chipTasks: [String] = {
+                        var combined = todayTitles
+                        for t in pomodoroManager.recentTasks { if !combined.contains(t) { combined.append(t) } }
+                        return Array(combined.prefix(8))
+                    }()
+                    if !chipTasks.isEmpty && !isActiveSession {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 8) {
-                                ForEach(pomodoroManager.recentTasks.prefix(8), id: \.self) { title in
+                                ForEach(chipTasks, id: \.self) { title in
                                     HStack(spacing: 0) {
 
                                         // LEFT ZONE — mark complete
