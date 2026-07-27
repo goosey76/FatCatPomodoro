@@ -340,17 +340,12 @@ class PomodoroManager: ObservableObject {
         
         // Send to Jarvi by AsIfThatWorks
         JarviManager.shared.logPomodoroSession(durationMinutes: max(1, durationMins), taskName: taskTitle, interrupted: true)
-        JarviManager.shared.sendEvent(type: "FLOW_PAUSE", sessionId: UUID().uuidString, title: taskTitle, workMins: max(1, durationMins), breakMins: breakDuration / 60)
         
         // Reset everything
         self.reset()
     }
     
     func discardAndReset() {
-        // Send a pause/cancel event to Jarvi without saving anything to the calendar/history
-        if sessionType == .work {
-            JarviManager.shared.sendEvent(type: "FLOW_PAUSE", sessionId: UUID().uuidString, title: currentTask, workMins: 0, breakMins: breakDuration / 60)
-        }
         self.currentTask = ""
         self.reset()
     }
@@ -379,12 +374,13 @@ class PomodoroManager: ObservableObject {
             }
     }
     
-    func pause() {
-        if isRunning {
+    // silent=true for internal stops (completeSession, startWorkSession) — no outbound event.
+    func pause(_ silent: Bool = false) {
+        if isRunning && !silent {
             if sessionType == .work {
-                JarviManager.shared.sendEvent(type: "FLOW_PAUSE", sessionId: UUID().uuidString, title: currentTask, workMins: workDuration / 60, breakMins: breakDuration / 60)
+                JarviManager.shared.sendFatcatEvent("FLOW_PAUSE", title: currentTask, workDurationMins: workDuration / 60, breakDurationMins: breakDuration / 60)
             } else {
-                JarviManager.shared.sendEvent(type: "BREAK_PAUSE", sessionId: UUID().uuidString, title: currentTask, workMins: workDuration / 60, breakMins: breakDuration / 60)
+                JarviManager.shared.sendFatcatEvent("BREAK_PAUSE")
             }
         }
         isRunning = false
@@ -480,7 +476,7 @@ class PomodoroManager: ObservableObject {
     }
     
     private func completeSession() {
-        pause()
+        pause(true) // silent: COMPLETED event is sent below, not FLOW_PAUSE
         isPausedConfirming = false
         if sessionType == .work {
             sessionsInCycle += 1
@@ -537,9 +533,10 @@ class PomodoroManager: ObservableObject {
     }
     
     private func startWorkSession() {
-        pause()
+        pause(true) // silent: break ending naturally, not a user pause
         isPausedConfirming = false
-        
+
+        JarviManager.shared.sendFatcatEvent("BREAK_END")
         JarviManager.shared.sendEvent(type: "BREAK_END", sessionId: UUID().uuidString, title: "Break", workMins: workDuration / 60, breakMins: breakDuration / 60)
         
         currentTask = ""
