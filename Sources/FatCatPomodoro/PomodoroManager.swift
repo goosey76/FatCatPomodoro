@@ -489,7 +489,7 @@ class PomodoroManager: ObservableObject {
             let taskTitle = trimmedTask.isEmpty ? "FatCatFlow Session" : trimmedTask
             
             JarviManager.shared.logPomodoroSession(durationMinutes: workDuration / 60, taskName: taskTitle, interrupted: false)
-            JarviManager.shared.sendFatcatEvent("COMPLETED")
+            JarviManager.shared.sendFatcatEvent("COMPLETED", title: taskTitle, workDurationMins: workDuration / 60, breakDurationMins: breakDuration / 60)
 
             // If not linked to Jarvi, we send FLOW_END as a fallback webhook.
             // If linked, logPomodoroSession (analytics) and the Calendar block are sufficient.
