@@ -575,16 +575,26 @@ struct IslandView: View {
                                     .foregroundColor(.white.opacity(0.4))
                                 
                                 ZStack {
-                                    TextField("", text: $pomodoroManager.currentTask)
-                                        .textFieldStyle(PlainTextFieldStyle())
-                                        .multilineTextAlignment(.center)
-                                        .foregroundColor(.white.opacity(0.95))
-                                        .font(.system(size: 12, weight: .bold, design: .rounded))
-                                        .focused($taskFieldFocused)
-                                        .onTapGesture {
-                                            NSApp.activate(ignoringOtherApps: true)
-                                            taskFieldFocused = true
-                                        }
+                                    HStack(spacing: 4) {
+                                        TextField("", text: $pomodoroManager.currentTask)
+                                            .textFieldStyle(PlainTextFieldStyle())
+                                            .multilineTextAlignment(.center)
+                                            .foregroundColor(.white.opacity(0.95))
+                                            .font(.system(size: 12, weight: .bold, design: .rounded))
+                                            .focused($taskFieldFocused)
+                                            .onTapGesture {
+                                                NSApp.activate(ignoringOtherApps: true)
+                                                taskFieldFocused = true
+                                            }
+                                        
+                                        Image(systemName: "pencil")
+                                            .font(.system(size: 9))
+                                            .foregroundColor(.white.opacity(0.4))
+                                            .onTapGesture {
+                                                NSApp.activate(ignoringOtherApps: true)
+                                                taskFieldFocused = true
+                                            }
+                                    }
                                         .onSubmit {
                                             pomodoroManager.currentTask = pomodoroManager.currentTask.trimmingCharacters(in: .whitespacesAndNewlines)
                                             pomodoroManager.saveTaskToRecent()
@@ -1094,9 +1104,14 @@ struct SettingsQuickSetupView: View {
                             HStack {
                                 HStack(spacing: 4) {
                                     Circle().fill(Color.green).frame(width: 6, height: 6)
-                                    Text("Linked to Jarvi by AsIfThatWorks")
-                                        .font(.system(size: 10, weight: .bold))
-                                        .foregroundColor(.white.opacity(0.8))
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Linked to Jarvi by AsIfThatWorks")
+                                            .font(.system(size: 10, weight: .bold))
+                                            .foregroundColor(.white.opacity(0.8))
+                                        Text("Fully supports Google Events & Google Tasks integration with the Jarvi Chief Executor")
+                                            .font(.system(size: 8, weight: .regular))
+                                            .foregroundColor(.white.opacity(0.5))
+                                    }
                                 }
                                 Spacer()
                                 Button("↻ Pull Todos") {

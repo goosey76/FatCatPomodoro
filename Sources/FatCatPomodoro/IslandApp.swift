@@ -249,10 +249,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
         let screen = notchScreen
-        let savedX = UserDefaults.standard.double(forKey: "pomodoro.breakOverlayX")
-        let savedY = UserDefaults.standard.double(forKey: "pomodoro.breakOverlayY")
+        let savedX = UserDefaults.standard.double(forKey: "pomodoro.breakOverlayX_v3")
+        let savedY = UserDefaults.standard.double(forKey: "pomodoro.breakOverlayY_v3")
         let defaultX = screen.frame.origin.x + 24
-        let defaultY = screen.frame.maxY - 180 - 24
+        let defaultY = screen.frame.maxY - 250 - 24
         var startX = savedX != 0 ? savedX : defaultX
         var startY = savedY != 0 ? savedY : defaultY
         
@@ -287,10 +287,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 class DraggableOverlayWindow: NSWindow {
     override var canBecomeKey: Bool { true }
     
-    override func mouseUp(with event: NSEvent) {
-        super.mouseUp(with: event)
-        UserDefaults.standard.set(frame.origin.x, forKey: "pomodoro.breakOverlayX")
-        UserDefaults.standard.set(frame.origin.y, forKey: "pomodoro.breakOverlayY")
+    override init(contentRect: NSRect, styleMask style: NSWindow.StyleMask, backing backingStoreType: NSWindow.BackingStoreType, defer flag: Bool) {
+        super.init(contentRect: contentRect, styleMask: style, backing: backingStoreType, defer: flag)
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(windowDidMove(_:)),
+            name: NSWindow.didMoveNotification,
+            object: self
+        )
+    }
+    
+    @objc private func windowDidMove(_ notification: Notification) {
+        UserDefaults.standard.set(frame.origin.x, forKey: "pomodoro.breakOverlayX_v3")
+        UserDefaults.standard.set(frame.origin.y, forKey: "pomodoro.breakOverlayY_v3")
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 }
 
