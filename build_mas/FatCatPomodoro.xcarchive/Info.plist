@@ -18,14 +18,14 @@
 		<key>CFBundleVersion</key>
 		<string>1</string>
 		<key>SigningIdentity</key>
-		<string></string>
+		<string>Apple Development: Ky Anh Pham (W99V9DN93Y)</string>
 		<key>Team</key>
-		<string></string>
+		<string>NZJ6XP9B66</string>
 	</dict>
 	<key>ArchiveVersion</key>
 	<integer>2</integer>
 	<key>CreationDate</key>
-	<date>2026-08-28T09:20:02Z</date>
+	<date>2026-08-28T10:48:10Z</date>
 	<key>Name</key>
 	<string>FatCatPomodoro</string>
 	<key>SchemeName</key>
