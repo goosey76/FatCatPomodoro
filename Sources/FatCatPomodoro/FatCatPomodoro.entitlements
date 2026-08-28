@@ -1,23 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-    <!-- Hardened Runtime: allow outbound network (Jarvi webhook calls) -->
-    <key>com.apple.security.network.client</key>
-    <true/>
-    <!-- App Sandbox -->
-    <key>com.apple.security.app-sandbox</key>
-    <true/>
-    <!-- TCC: prompt for Calendar access (EventKit) -->
-    <key>com.apple.security.personal-information.calendars</key>
-    <true/>
-    <!-- TCC: prompt for Reminders access (EventKit) -->
-    <key>com.apple.security.personal-information.reminders</key>
-    <true/>
-    <!-- Keychain: explicit Team ID prefix, required outside sandbox -->
-    <key>keychain-access-groups</key>
-    <array>
-        <string>NZJ6XP9B66.com.fatcat.FatCatPomodoro</string>
-    </array>
-</dict>
+<dict/>
 </plist>

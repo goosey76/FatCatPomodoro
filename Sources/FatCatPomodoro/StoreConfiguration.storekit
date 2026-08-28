@@ -1,0 +1,66 @@
+{
+  "identifier" : "E2B3830E",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "9.99",
+      "familyShareable" : false,
+      "internalID" : "12345678",
+      "localizations" : [
+        {
+          "description" : "Unlock all cat variants instantly.",
+          "displayName" : "Lifetime Unlock",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.fatcat.FatCatPomodoro.lifetime",
+      "referenceName" : "Lifetime Unlock",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "87654321",
+      "localizations" : [
+
+      ],
+      "name" : "Monthly Subscriptions",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "1.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "87654322",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Unlock all cat variants and support development.",
+              "displayName" : "Monthly Support",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.fatcat.FatCatPomodoro.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Monthly",
+          "subscriptionGroupID" : "87654321",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

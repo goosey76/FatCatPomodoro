@@ -5,6 +5,7 @@ import Combine
 @main
 struct IslandApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @StateObject private var storeManager = StoreManager.shared
 
     var body: some Scene {
         Settings {
@@ -249,10 +250,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
         let screen = notchScreen
-        let savedX = UserDefaults.standard.double(forKey: "pomodoro.breakOverlayX_v3")
-        let savedY = UserDefaults.standard.double(forKey: "pomodoro.breakOverlayY_v3")
-        let defaultX = screen.frame.origin.x + 24
-        let defaultY = screen.frame.maxY - 250 - 24
+        let savedX = UserDefaults.standard.double(forKey: "pomodoro.breakOverlayX_v4")
+        let savedY = UserDefaults.standard.double(forKey: "pomodoro.breakOverlayY_v4")
+        let defaultX = screen.frame.origin.x + 150
+        let defaultY = screen.frame.maxY - 350
         var startX = savedX != 0 ? savedX : defaultX
         var startY = savedY != 0 ? savedY : defaultY
         
@@ -299,8 +300,8 @@ class DraggableOverlayWindow: NSWindow {
     }
     
     @objc private func windowDidMove(_ notification: Notification) {
-        UserDefaults.standard.set(frame.origin.x, forKey: "pomodoro.breakOverlayX_v3")
-        UserDefaults.standard.set(frame.origin.y, forKey: "pomodoro.breakOverlayY_v3")
+        UserDefaults.standard.set(frame.origin.x, forKey: "pomodoro.breakOverlayX_v4")
+        UserDefaults.standard.set(frame.origin.y, forKey: "pomodoro.breakOverlayY_v4")
     }
     
     deinit {

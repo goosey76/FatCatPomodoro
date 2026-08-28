@@ -1,4 +1,8 @@
 import SwiftUI
+import AppKit
+import Foundation
+import EventKit
+import StoreKit
 
 struct IslandView: View {
     @ObservedObject var pomodoroManager: PomodoroManager
@@ -961,6 +965,7 @@ struct SettingsQuickSetupView: View {
     @ObservedObject var launchManager  = LaunchAtLoginManager.shared
     @ObservedObject var calendarManager = CalendarManager.shared
     @ObservedObject var jarviManager = JarviManager.shared
+    @ObservedObject var storeManager = StoreManager.shared
     @State private var pinCode: String = ""
     @State private var isPairingPin: Bool = false
     @State private var pinError: String? = nil
@@ -1241,6 +1246,10 @@ struct SettingsQuickSetupView: View {
 
                     Divider().background(Color.white.opacity(0.1))
 
+                    storeSection
+                    
+                    Divider().background(Color.white.opacity(0.1))
+
                     // Advanced Settings Collapsible Button
                     Button(action: {
                         withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
@@ -1299,6 +1308,83 @@ struct SettingsQuickSetupView: View {
     }
 
     @ViewBuilder
+    private var storeSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("PREMIUM / SUPPORT")
+                .font(.system(size: 9, weight: .black))
+                .foregroundColor(.white.opacity(0.4))
+                .tracking(1)
+
+            if storeManager.isUnlocked {
+                HStack {
+                    Text("Premium Unlocked")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(.green)
+                    Spacer()
+                    Image(systemName: "checkmark.seal.fill")
+                        .foregroundColor(.green)
+                }
+                .padding()
+                .background(Color.white.opacity(0.04))
+                .cornerRadius(8)
+            } else {
+                VStack(spacing: 8) {
+                    Text("Support Development!")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(.white.opacity(0.7))
+                    
+                    HStack(spacing: 12) {
+                        if let lifetime = storeManager.lifetimeProduct {
+                            Button(action: {
+                                Task { try? await storeManager.purchase(lifetime) }
+                            }) {
+                                VStack {
+                                    Text("Lifetime")
+                                        .font(.system(size: 11, weight: .bold))
+                                    Text(lifetime.displayPrice)
+                                        .font(.system(size: 9))
+                                }
+                                .padding(.vertical, 8)
+                                .frame(maxWidth: .infinity)
+                                .background(Color.orange.opacity(0.2))
+                                .cornerRadius(6)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                        
+                        if let monthly = storeManager.monthlyProduct {
+                            Button(action: {
+                                Task { try? await storeManager.purchase(monthly) }
+                            }) {
+                                VStack {
+                                    Text("Monthly")
+                                        .font(.system(size: 11, weight: .bold))
+                                    Text(monthly.displayPrice)
+                                        .font(.system(size: 9))
+                                }
+                                .padding(.vertical, 8)
+                                .frame(maxWidth: .infinity)
+                                .background(Color.blue.opacity(0.2))
+                                .cornerRadius(6)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                    }
+                    
+                    Button("Restore Purchases") {
+                        Task { await storeManager.restorePurchases() }
+                    }
+                    .font(.system(size: 9, weight: .semibold))
+                    .foregroundColor(.white.opacity(0.5))
+                    .padding(.top, 4)
+                }
+                .padding()
+                .background(Color.white.opacity(0.04))
+                .cornerRadius(8)
+            }
+        }
+    }
+
     private var advancedSettingsContent: some View {
         VStack(spacing: 16) {
             coreTogglesSection

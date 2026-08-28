@@ -14,6 +14,7 @@
 		28E73CFF771F8DA59731DBAA /* PomodoroActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BB235001561BCDC4E4D4443 /* PomodoroActivityView.swift */; };
 		2E929D283F5A9FFC282566C8 /* HorizontalDialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92B134928F0CEBC9159EE686 /* HorizontalDialView.swift */; };
 		33996C4A96408555681F7572 /* LaunchAtLoginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC20ECDAE162667D07E849A5 /* LaunchAtLoginManager.swift */; };
+		4379013C0FFF36D2341CF68A /* StoreConfiguration.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 911C9EA72AD2ADDE50B8788B /* StoreConfiguration.storekit */; };
 		4C38B3F88CCA5BAA34774E27 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C07D47BD4E4C92F917C7BC01 /* PrivacyInfo.xcprivacy */; };
 		4D8EC5FCCB93D4696F3DB027 /* LoopingVideoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6FD14AF85AD2AB969F2868B /* LoopingVideoPlayer.swift */; };
 		56364E772C0937DD8D3A667A /* ScoreComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75A0ADE9D13D72676858658B /* ScoreComponents.swift */; };
@@ -23,6 +24,7 @@
 		87B5128D1E9F19F12016ACCD /* JarviManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E77355591CD4EB2D54E99E0B /* JarviManager.swift */; };
 		88A030C03548011B13DCB0C2 /* CalendarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C4F4D2087F3B62B62CAEE8E /* CalendarManager.swift */; };
 		8A03926F61664AE53DF4E8FD /* IslandApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7886602B476919F5DDF7AF9 /* IslandApp.swift */; };
+		9491BF6A047FEA62E1AACDEE /* StoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98903B45656C042FEC8A4B19 /* StoreManager.swift */; };
 		A60B82101282B00FB2D341C5 /* face_cat.png in Resources */ = {isa = PBXBuildFile; fileRef = E8C3938410DDA599A8500A48 /* face_cat.png */; };
 		BD5516CB213C6D6208EB71C4 /* MusicManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F04F6B27857427ADCBE682 /* MusicManager.swift */; };
 		DBB7DA394124D8CF3D918435 /* PomodoroHistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB865F42C61E88E0BE5FE920 /* PomodoroHistoryManager.swift */; };
@@ -45,7 +47,9 @@
 		55B6A920A53CC077B4F31671 /* FatCatPomodoro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FatCatPomodoro.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		75234A73BD095D23BD7D143F /* cleancat_safari.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = cleancat_safari.mov; sourceTree = "<group>"; };
 		75A0ADE9D13D72676858658B /* ScoreComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreComponents.swift; sourceTree = "<group>"; };
+		911C9EA72AD2ADDE50B8788B /* StoreConfiguration.storekit */ = {isa = PBXFileReference; path = StoreConfiguration.storekit; sourceTree = "<group>"; };
 		92B134928F0CEBC9159EE686 /* HorizontalDialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalDialView.swift; sourceTree = "<group>"; };
+		98903B45656C042FEC8A4B19 /* StoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreManager.swift; sourceTree = "<group>"; };
 		993DA40AEA4D90ACF1AECB95 /* FatCatPomodoro.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FatCatPomodoro.entitlements; sourceTree = "<group>"; };
 		9C4F4D2087F3B62B62CAEE8E /* CalendarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarManager.swift; sourceTree = "<group>"; };
 		9E943987BCA84F4295CD4A21 /* StreakManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakManager.swift; sourceTree = "<group>"; };
@@ -122,6 +126,8 @@
 				DB865F42C61E88E0BE5FE920 /* PomodoroHistoryManager.swift */,
 				3CCD5B3FDA2554BAD351E52D /* PomodoroManager.swift */,
 				C07D47BD4E4C92F917C7BC01 /* PrivacyInfo.xcprivacy */,
+				911C9EA72AD2ADDE50B8788B /* StoreConfiguration.storekit */,
+				98903B45656C042FEC8A4B19 /* StoreManager.swift */,
 				9E943987BCA84F4295CD4A21 /* StreakManager.swift */,
 			);
 			name = FatCatPomodoro;
@@ -192,6 +198,7 @@
 				F39AA9937DC664C66F8DC576 /* FatCatPomodoro.icns in Resources */,
 				048040C9FBEC00B81EBC84E3 /* FatCatPomodoro.png in Resources */,
 				4C38B3F88CCA5BAA34774E27 /* PrivacyInfo.xcprivacy in Resources */,
+				4379013C0FFF36D2341CF68A /* StoreConfiguration.storekit in Resources */,
 				DF91BE094D04A9485CA27DF9 /* cleancat.mp4 in Resources */,
 				0126A1B5E33EB6BEA194F6FB /* cleancat_safari.mov in Resources */,
 				E1741B636F8E7F657A2608EA /* face_cat.icns in Resources */,
@@ -221,6 +228,7 @@
 				DBB7DA394124D8CF3D918435 /* PomodoroHistoryManager.swift in Sources */,
 				6A762D248303C6AA156F49C0 /* PomodoroManager.swift in Sources */,
 				56364E772C0937DD8D3A667A /* ScoreComponents.swift in Sources */,
+				9491BF6A047FEA62E1AACDEE /* StoreManager.swift in Sources */,
 				5BECE23CDD0EF7E0EF3D8787 /* StreakManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

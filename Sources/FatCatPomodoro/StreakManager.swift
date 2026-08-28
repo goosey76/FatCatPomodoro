@@ -37,16 +37,11 @@ class StreakManager: ObservableObject {
         UserDefaults.standard.set(today, forKey: "streak.lastCompletionDate")
     }
 
-    // 3 standard Fat Cats — unlocked by streak
     var catEmoji: String {
-        if currentStreak >= 7 { return "😻" } // Heart-Eyes Cat (7+ day streak)
-        if currentStreak >= 3 { return "😸" } // Happy Cat (3+ day streak)
-        return "😺"                            // Fat Cat (default)
+        return "😺" // Real face cat only, no variety
     }
 
     var catName: String {
-        if currentStreak >= 7 { return "Heart-Eyes Cat" }
-        if currentStreak >= 3 { return "Happy Cat" }
         return "Fat Cat"
     }
 }
