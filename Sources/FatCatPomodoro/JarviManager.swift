@@ -98,14 +98,17 @@ class JarviManager: ObservableObject {
                 guard (command.ageSeconds ?? 0) <= 90 else { continue }
 
                 DispatchQueue.main.async {
+                    var userInfo: [String: Any] = [
+                        "title": command.title ?? "",
+                        "workDurationMins": command.workDurationMins ?? 25,
+                    ]
+                    if let breakMins = command.breakDurationMins {
+                        userInfo["breakDurationMins"] = breakMins
+                    }
                     NotificationCenter.default.post(
                         name: Notification.Name("JarviStartPomodoro"),
                         object: nil,
-                        userInfo: [
-                            "title": command.title ?? "",
-                            "workDurationMins": command.workDurationMins ?? 25,
-                            "breakDurationMins": command.breakDurationMins ?? 5
-                        ]
+                        userInfo: userInfo
                     )
                 }
             }

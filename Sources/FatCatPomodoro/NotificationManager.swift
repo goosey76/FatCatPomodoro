@@ -159,7 +159,7 @@ class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
         content.body = message
         content.sound = .default
         
-        if let iconURL = Bundle.main.url(forResource: "face_cat", withExtension: "png") ?? Bundle.module.url(forResource: "face_cat", withExtension: "png"),
+        if let iconURL = Bundle.main.url(forResource: "face_cat", withExtension: "png"),
            let attachment = try? UNNotificationAttachment(identifier: "face_cat", url: iconURL, options: nil) {
             content.attachments = [attachment]
         }
@@ -180,7 +180,7 @@ class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
             notification.informativeText = message
             notification.soundName = NSUserNotificationDefaultSoundName
             
-            if let iconURL = Bundle.main.url(forResource: "FatCatPomodoro", withExtension: "png") ?? Bundle.module.url(forResource: "FatCatPomodoro", withExtension: "png"),
+            if let iconURL = Bundle.main.url(forResource: "FatCatPomodoro", withExtension: "png"),
                let iconImage = NSImage(contentsOf: iconURL) {
                 notification.contentImage = iconImage
             }

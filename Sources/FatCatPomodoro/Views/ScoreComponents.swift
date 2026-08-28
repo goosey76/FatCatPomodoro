@@ -6,8 +6,10 @@ struct CatIconView: View {
     let size: CGFloat
 
     var body: some View {
-        if let path = Bundle.module.path(forResource: "face_cat", ofType: "png"),
-           let nsImage = NSImage(contentsOfFile: path) {
+        let path = Bundle.main.path(forResource: "face_cat", ofType: "png") ?? 
+                   Bundle(for: AppDelegate.self).path(forResource: "face_cat", ofType: "png")
+        
+        if let path = path, let nsImage = NSImage(contentsOfFile: path) {
             Image(nsImage: nsImage)
                 .resizable()
                 .scaledToFit()

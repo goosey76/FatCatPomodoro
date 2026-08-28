@@ -17,6 +17,7 @@ struct IslandView: View {
     @State private var hoveredTask: String? = nil
     @State private var hoveredCheckmarkTask: String? = nil
     @State private var startSessionHoverTask: Task<Void, Never>? = nil
+    @FocusState private var taskFieldFocused: Bool
 
     // Hold to Quit state
     @State private var quitHoldProgress: CGFloat = 0
@@ -579,6 +580,11 @@ struct IslandView: View {
                                         .multilineTextAlignment(.center)
                                         .foregroundColor(.white.opacity(0.95))
                                         .font(.system(size: 12, weight: .bold, design: .rounded))
+                                        .focused($taskFieldFocused)
+                                        .onTapGesture {
+                                            NSApp.activate(ignoringOtherApps: true)
+                                            taskFieldFocused = true
+                                        }
                                         .onSubmit {
                                             pomodoroManager.currentTask = pomodoroManager.currentTask.trimmingCharacters(in: .whitespacesAndNewlines)
                                             pomodoroManager.saveTaskToRecent()
@@ -634,6 +640,22 @@ struct IslandView: View {
                                 .multilineTextAlignment(.center)
                                 .foregroundColor(.white)
                                 .font(.system(size: 12, weight: .medium, design: .rounded))
+                                .focused($taskFieldFocused)
+                                .onTapGesture {
+                                    NSApp.activate(ignoringOtherApps: true)
+                                    taskFieldFocused = true
+                                }
+                                .onChange(of: pomodoroManager.currentTask) { newValue in
+                                    // When user types first letter and view switches to the active
+                                    // "FOCUSING on" layout with a different TextField, SwiftUI
+                                    // destroys this field — immediately re-focus the replacement.
+                                    if !newValue.isEmpty && pomodoroManager.isRunning {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                            NSApp.activate(ignoringOtherApps: true)
+                                            taskFieldFocused = true
+                                        }
+                                    }
+                                }
                                 .onSubmit {
                                     pomodoroManager.currentTask = pomodoroManager.currentTask.trimmingCharacters(in: .whitespacesAndNewlines)
                                     pomodoroManager.saveTaskToRecent()
@@ -641,7 +663,7 @@ struct IslandView: View {
                                         displayMode = .work
                                         pomodoroManager.sessionType = .work
                                         pomodoroManager.timeRemaining = pomodoroManager.workDuration
-                                        pomodoroManager.start() 
+                                        pomodoroManager.start()
                                     }
                                 }
 
@@ -687,14 +709,8 @@ struct IslandView: View {
                     // Task chips — hidden while a session is actively running (current task shown above)
                     let isActiveSession = pomodoroManager.isRunning && pomodoroManager.sessionType == .work && !pomodoroManager.currentTask.isEmpty
                     // Today's history titles first (quick re-run), then remaining fetched todos
-                    let todayTitles = PomodoroHistoryManager.shared.todaysHistory
-                        .map { $0.title }
-                        .filter { !$0.hasSuffix("(Partial)") }
-                        .reduce(into: [String]()) { acc, t in if !acc.contains(t) { acc.append(t) } }
                     let chipTasks: [String] = {
-                        var combined = todayTitles
-                        for t in pomodoroManager.recentTasks { if !combined.contains(t) { combined.append(t) } }
-                        return Array(combined.prefix(8))
+                        return Array(pomodoroManager.recentTasks.prefix(8))
                     }()
                     if !chipTasks.isEmpty && !isActiveSession {
                         ScrollView(.horizontal, showsIndicators: false) {
@@ -855,23 +871,41 @@ struct IslandView: View {
                     .frame(width: 420)
                     .padding(.top, (pomodoroManager.isRunning && pomodoroManager.sessionType == .breakTime) ? 12 : 4)
 
-                    // Activity Suggestions (idle only)
-                    if !pomodoroManager.isRunning || pomodoroManager.sessionType != .breakTime {
-                        HStack(spacing: 8) {
-                            ForEach(["Stretch", "Hydrate", "Walk", "Breathe"], id: \.self) { activity in
+                    // Activity chips — always visible so user can tag their break at any time
+                    HStack(spacing: 8) {
+                        ForEach(["Stretch", "Hydrate", "Walk", "Breathe"], id: \.self) { activity in
+                            let isSelected = pomodoroManager.breakActivity == activity
+                            Button {
+                                withAnimation(.easeInOut(duration: 0.18)) {
+                                    if pomodoroManager.isRunning && pomodoroManager.sessionType == .breakTime {
+                                        // Break already running — just tag the activity
+                                        pomodoroManager.breakActivity = activity
+                                        if pomodoroManager.breakSessionStart == nil {
+                                            pomodoroManager.breakSessionStart = Date()
+                                        }
+                                    } else {
+                                        // Start break and tag activity
+                                        pomodoroManager.startBreakWithActivity(activity)
+                                    }
+                                }
+                            } label: {
                                 Text(activity)
                                     .font(.system(size: 9, weight: .bold, design: .rounded))
-                                    .foregroundColor(.white.opacity(0.4))
+                                    .foregroundColor(isSelected ? .orange : .white.opacity(0.4))
                                     .padding(.horizontal, 10)
                                     .padding(.vertical, 5)
-                                    .background(Color.white.opacity(0.04))
+                                    .background(isSelected ? Color.orange.opacity(0.15) : Color.white.opacity(0.04))
                                     .clipShape(Capsule())
+                                    .overlay(
+                                        Capsule()
+                                            .stroke(isSelected ? Color.orange.opacity(0.5) : Color.clear, lineWidth: 1)
+                                    )
                             }
+                            .buttonStyle(PlainButtonStyle())
+                            .help(pomodoroManager.isRunning ? "Tag this break as: \(activity)" : "Start break: \(activity)")
                         }
-                        .padding(.top, 12)
-                    } else {
-                        Spacer().frame(height: 12)
                     }
+                    .padding(.top, 12)
 
                     Spacer(minLength: 0)
                 }

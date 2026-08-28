@@ -82,9 +82,71 @@ The app acts as a real-time focus telemetry dispatcher, fully supporting the off
 
 ---
 
-## 💾 How to Build and Run
+## 💾 How to Build & Distribute
 
-To compile and package the app manually inside the native `.app` bundle (ensuring the embedded URL scheme is registered and the transparent cat video resource loads correctly):
+FatCatPomodoro ships as a **signed, notarized .dmg** for direct download — not through the Mac App Store.
+All build scripts live in `scripts/`. Run them in order from the repo root.
+
+### Prerequisites
+
+| Requirement | How to check |
+|---|---|
+| Xcode 16+ | `xcode-select -p` |
+| Developer ID Application cert | `security find-identity -v -p codesigning \| grep "Developer ID Application"` |
+| Apple ID app-specific password | Generate at [appleid.apple.com](https://appleid.apple.com) → Sign-In & Security → App-Specific Passwords |
+
+### Step 1 — Archive & Export
+
+```bash
+./scripts/build_archive.sh
+```
+
+This runs `xcodebuild archive` (Release, Developer ID signing) → `xcodebuild -exportArchive` using `ExportOptions.plist` → verifies the code signature with `codesign --verify --deep --strict`. Output: `build/export/FatCatPomodoro.app`.
+
+### Step 2 — Notarize & Staple
+
+```bash
+# Provide credentials via env vars (never commit these):
+export APPLE_ID="you@example.com"
+export APP_SPECIFIC_PASSWORD="xxxx-xxxx-xxxx-xxxx"
+
+./scripts/notarize.sh
+```
+
+Or store credentials in the keychain once (more secure):
+
+```bash
+xcrun notarytool store-credentials "FatCatPomodoro-notarize" \
+    --apple-id "$APPLE_ID" \
+    --team-id NZJ6XP9B66 \
+    --password "$APP_SPECIFIC_PASSWORD"
+
+export NOTARYTOOL_KEYCHAIN_PROFILE="FatCatPomodoro-notarize"
+./scripts/notarize.sh
+```
+
+The script submits the zip to Apple's notary service, waits for `Accepted` status, staples the ticket, and validates with `spctl`. Typical turnaround: 1–5 minutes.
+
+### Step 3 — Package as DMG
+
+```bash
+./scripts/make_dmg.sh
+```
+
+Creates a drag-to-Applications `.dmg` at `build/FatCatPomodoro-1.0.dmg`. Hand this file off to be hosted on the download server.
+
+### Smoke-test on a clean Mac
+
+1. Copy `build/FatCatPomodoro-1.0.dmg` to a fresh Mac (or VM) that has never seen the app.
+2. Double-click to mount → drag to `/Applications` → launch.
+3. Gatekeeper should pass silently — **no "unidentified developer" dialog**.
+4. On first use, TCC prompts will fire for Calendar and Reminders access — this is expected and correct.
+
+---
+
+### 🛠 Quick Dev Run (local only — not distributable)
+
+To iterate during development without a full archive:
 
 ```bash
 # 1. Build the executable
@@ -105,6 +167,8 @@ cp -R .build/arm64-apple-macosx/debug/FatCatPomodoro_FatCatPomodoro.bundle .buil
 # 5. Run the app
 open .build/FatCatPomodoro.app
 ```
+
+> **Note:** The swift build path produces an unsigned debug binary. It won't pass Gatekeeper and is not suitable for distribution.
 
 ---
 

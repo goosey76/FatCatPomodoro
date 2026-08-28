@@ -50,6 +50,14 @@ class PomodoroManager: ObservableObject {
     @Published var currentTask: String = ""
     @Published var recentTasks: [String] = []
     var sessionStartDate: Date?
+    /// Titles of tasks completed but not yet removed from the server-side list.
+    /// Filters them out of refreshes for 30 s to prevent re-appearance.
+    private var pendingCompletions: Set<String> = []
+
+    /// Break activity selected by the user (e.g. "Stretch", "Walk").
+    @Published var breakActivity: String = ""
+    /// When the current break session actually started (for accurate calendar event duration).
+    var breakSessionStart: Date?
     
     // EventKit store for Reminders
     private let eventStore = EKEventStore()
@@ -132,9 +140,10 @@ class PomodoroManager: ObservableObject {
             guard let self = self, let userInfo = notification.userInfo else { return }
             let title = userInfo["title"] as? String ?? ""
             let workMins = userInfo["workDurationMins"] as? Int ?? 25
-            let breakMins = userInfo["breakDurationMins"] as? Int ?? 5
             self.workDuration = workMins * 60
-            self.breakDuration = max(0, breakMins) * 60
+            if let breakMins = userInfo["breakDurationMins"] as? Int {
+                self.breakDuration = max(0, breakMins) * 60
+            }
             self.currentTask = title
             self.sessionType = .work
             self.reset()
@@ -199,7 +208,12 @@ class PomodoroManager: ObservableObject {
         } else {
             JarviManager.shared.fetchTodos(list: targetTodoList) { [weak self] tasks in
                 guard let self = self else { return }
-                self.recentTasks = tasks
+                // Filter out tasks that were just completed but not yet removed server-side
+                self.recentTasks = tasks.filter { fetchedTask in
+                    !self.pendingCompletions.contains { pendingTask in
+                        pendingTask.caseInsensitiveCompare(fetchedTask.trimmingCharacters(in: .whitespacesAndNewlines)) == .orderedSame
+                    }
+                }
             }
         }
     }
@@ -242,6 +256,8 @@ class PomodoroManager: ObservableObject {
         let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         let taskTitle = trimmedTitle.isEmpty ? "Completed Task" : trimmedTitle
         
+        let isActiveSession = (title == currentTask) && (sessionStartDate != nil)
+        
         // Calculate session durations if this was the active task running, or default duration
         let startDate = sessionStartDate ?? Date().addingTimeInterval(-Double(workDuration))
         let endDate = Date()
@@ -251,29 +267,37 @@ class PomodoroManager: ObservableObject {
             JarviManager.shared.completeGoogleTask(taskTitle: taskTitle, listId: targetTodoList, durationMinutes: durationMinutes)
         }
         
-        // Log to target calendar when task is marked completed
-        let cleanCalendarId = targetCalendarID.isEmpty ? "primary" : targetCalendarID
-        if calendarSource == "jarvi" || calendarSource == "google" {
-            JarviManager.shared.addGoogleCalendarEvent(title: taskTitle, startDate: startDate, endDate: endDate, calendarId: cleanCalendarId)
-        } else {
-            CalendarManager.shared.addEvent(title: taskTitle, startDate: startDate, endDate: endDate, calendarIdentifier: targetCalendarID)
-        }
-        
-        // Log to local history database and streak
-        let durationSeconds = sessionStartDate != nil ? max(60, Int(endDate.timeIntervalSince(startDate))) : workDuration
-        PomodoroHistoryManager.shared.logSession(title: taskTitle, startDate: startDate, endDate: endDate, durationSeconds: durationSeconds)
-        StreakManager.shared.recordSession()
-        
-        // Reset active session state if completing current task
-        if currentTask == title {
+        if isActiveSession {
+            // Log to target calendar when task is marked completed
+            let cleanCalendarId = targetCalendarID.isEmpty ? "primary" : targetCalendarID
+            if calendarSource == "jarvi" || calendarSource == "google" {
+                JarviManager.shared.addGoogleCalendarEvent(title: taskTitle, startDate: startDate, endDate: endDate, calendarId: cleanCalendarId)
+            } else {
+                CalendarManager.shared.addEvent(title: taskTitle, startDate: startDate, endDate: endDate, calendarIdentifier: targetCalendarID)
+            }
+            
+            // Log to local history database and streak
+            let durationSeconds = max(60, Int(endDate.timeIntervalSince(startDate)))
+            PomodoroHistoryManager.shared.logSession(title: taskTitle, startDate: startDate, endDate: endDate, durationSeconds: durationSeconds)
+            StreakManager.shared.recordSession()
+            
             if isRunning {
                 pause()
             }
             sessionStartDate = nil
             currentTask = ""
+        } else if title == currentTask {
+            // It was the current task but no session started yet.
+            currentTask = ""
         }
         
+        // Optimistically remove from local list and track as pending completion
+        // so it doesn't reappear when JarviTodosUpdated triggers a re-fetch
+        pendingCompletions.insert(taskTitle)
         removeTaskFromRecent(title)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 30) { [weak self] in
+            self?.pendingCompletions.remove(taskTitle)
+        }
     }
     
     func completeCurrentTask() {
@@ -361,7 +385,8 @@ class PomodoroManager: ObservableObject {
                 saveTaskToRecent()
             }
             if dndAutoToggle { NotificationManager.shared.setDND(enabled: true) }
-            JarviManager.shared.sendFatcatEvent("FLOW_START", title: currentTask, workDurationMins: workDuration / 60, breakDurationMins: breakDuration / 60)
+            let upcomingBreakMins = (sessionsInCycle + 1 >= sessionsUntilLongBreak) ? longBreakDuration / 60 : breakDuration / 60
+            JarviManager.shared.sendFatcatEvent("FLOW_START", title: currentTask, workDurationMins: workDuration / 60, breakDurationMins: upcomingBreakMins)
         } else {
             // It's a break
             JarviManager.shared.sendFatcatEvent("BREAK_START")
@@ -387,6 +412,22 @@ class PomodoroManager: ObservableObject {
         timer?.cancel()
         timer = nil
         if dndAutoToggle { NotificationManager.shared.setDND(enabled: false) }
+    }
+
+    /// Start a break and associate it with a chosen activity title.
+    /// Calling this when a break is already running just updates the activity label.
+    func startBreakWithActivity(_ activity: String) {
+        breakActivity = activity
+        if sessionType != .breakTime {
+            sessionType = .breakTime
+            timeRemaining = breakDuration
+        }
+        if !isRunning {
+            breakSessionStart = Date()
+            start()
+        } else if breakSessionStart == nil {
+            breakSessionStart = Date()
+        }
     }
     
     func reset() {
@@ -536,8 +577,23 @@ class PomodoroManager: ObservableObject {
         pause(true) // silent: break ending naturally, not a user pause
         isPausedConfirming = false
 
+        // Log break activity to calendar if user chose one
+        let breakEnd = Date()
+        let breakStart = breakSessionStart ?? breakEnd.addingTimeInterval(-Double(breakDuration))
+        let activityTitle = breakActivity.isEmpty ? "Break" : "\(breakActivity) Break"
+        if !breakActivity.isEmpty {
+            let cleanCalendarId = targetCalendarID.isEmpty ? "primary" : targetCalendarID
+            if calendarSource == "jarvi" || calendarSource == "google" {
+                JarviManager.shared.addGoogleCalendarEvent(title: activityTitle, startDate: breakStart, endDate: breakEnd, calendarId: cleanCalendarId)
+            } else {
+                CalendarManager.shared.addEvent(title: activityTitle, startDate: breakStart, endDate: breakEnd, calendarIdentifier: targetCalendarID)
+            }
+        }
+        breakActivity = ""
+        breakSessionStart = nil
+
         JarviManager.shared.sendFatcatEvent("BREAK_END")
-        JarviManager.shared.sendEvent(type: "BREAK_END", sessionId: UUID().uuidString, title: "Break", workMins: workDuration / 60, breakMins: breakDuration / 60)
+        JarviManager.shared.sendEvent(type: "BREAK_END", sessionId: UUID().uuidString, title: activityTitle, workMins: workDuration / 60, breakMins: breakDuration / 60)
         
         currentTask = ""
         sessionStartDate = nil

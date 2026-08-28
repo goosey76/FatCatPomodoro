@@ -13,7 +13,7 @@ settings:
     MACOSX_DEPLOYMENT_TARGET: "14.0"
     ENABLE_HARDENED_RUNTIME: YES
     CODE_SIGN_STYLE: Automatic
-    DEVELOPMENT_TEAM: ""
+    DEVELOPMENT_TEAM: "NZJ6XP9B66"
 
 targets:
   FatCatPomodoro:
@@ -26,8 +26,6 @@ targets:
           - "**/.DS_Store"
     resources:
       - path: Sources/FatCatPomodoro/Resources
-        excludes:
-          - "*.mov"
       - path: Sources/FatCatPomodoro/Assets.xcassets
     info:
       path: Sources/FatCatPomodoro/Info.plist

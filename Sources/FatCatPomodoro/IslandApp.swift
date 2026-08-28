@@ -32,7 +32,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
 
-        if let iconURL = Bundle.main.url(forResource: "FatCatPomodoro", withExtension: "png") ?? Bundle.module.url(forResource: "FatCatPomodoro", withExtension: "png"),
+        if let iconURL = Bundle.main.url(forResource: "FatCatPomodoro", withExtension: "png"),
            let iconImage = NSImage(contentsOf: iconURL) {
             NSApp.applicationIconImage = iconImage
         }
@@ -202,21 +202,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     }
                     return nil
                 }()
-                let hasProRes = Bundle.main.path(forResource: "cleancat", ofType: "mov") != nil
-                    || Bundle(for: AppDelegate.self).path(forResource: "cleancat", ofType: "mov") != nil
-                    || swiftPMBundle?.path(forResource: "cleancat", ofType: "mov") != nil
-                let (vidName, vidType) = hasProRes ? ("cleancat", "mov") : ("cleancat", "mp4")
+                let hasProRes = Bundle.main.path(forResource: "cleancat_safari", ofType: "mov") != nil
+                    || Bundle(for: AppDelegate.self).path(forResource: "cleancat_safari", ofType: "mov") != nil
+                    || swiftPMBundle?.path(forResource: "cleancat_safari", ofType: "mov") != nil
+                let (vidName, vidType) = hasProRes ? ("cleancat_safari", "mov") : ("cleancat", "mp4")
                 catWin.contentView = NSHostingView(
                     rootView: LoopingVideoPlayer(videoName: vidName, videoType: vidType).ignoresSafeArea()
                 )
                 self.fullScreenWindow = catWin
 
-                // Skip pill — bottom center, clickable
-                let btnW: CGFloat = 140
-                let btnH: CGFloat = 38
+                // Skip pill + activity chips — bottom center, clickable
+                let btnW: CGFloat = 360
+                let btnH: CGFloat = 80
                 let skipWin = NSWindow(
                     contentRect: NSRect(x: screen.frame.midX - btnW / 2,
-                                       y: screen.frame.minY + 28,
+                                       y: screen.frame.minY + 20,
                                        width: btnW, height: btnH),
                     styleMask: [.borderless, .fullSizeContentView],
                     backing: .buffered,
@@ -265,9 +265,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         
         if breakTimerWindow == nil {
-            let w: CGFloat = 380, h: CGFloat = 180
             let timerWin = DraggableOverlayWindow(
-                contentRect: NSRect(x: startX, y: startY, width: w, height: h),
+                contentRect: NSRect(x: startX, y: startY, width: 550, height: 250),
                 styleMask: [.borderless, .fullSizeContentView],
                 backing: .buffered,
                 defer: false
@@ -288,10 +287,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 class DraggableOverlayWindow: NSWindow {
     override var canBecomeKey: Bool { true }
     
-    override func mouseUp(with event: NSEvent) {
-        super.mouseUp(with: event)
+    override init(contentRect: NSRect, styleMask style: NSWindow.StyleMask, backing backingStoreType: NSWindow.BackingStoreType, defer flag: Bool) {
+        super.init(contentRect: contentRect, styleMask: style, backing: backingStoreType, defer: flag)
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(windowDidMove(_:)),
+            name: NSWindow.didMoveNotification,
+            object: self
+        )
+    }
+    
+    @objc private func windowDidMove(_ notification: Notification) {
         UserDefaults.standard.set(frame.origin.x, forKey: "pomodoro.breakOverlayX")
         UserDefaults.standard.set(frame.origin.y, forKey: "pomodoro.breakOverlayY")
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 }
 
@@ -353,26 +366,59 @@ struct ForegroundAlertView: View {
 }
 
 struct BreakSkipButton: View {
-    let pomodoroManager: PomodoroManager
+    @ObservedObject var pomodoroManager: PomodoroManager
 
     var body: some View {
-        Button(action: { pomodoroManager.skip() }) {
-            HStack(spacing: 6) {
-                Text("Skip Break")
-                    .font(.system(size: 12, weight: .bold, design: .rounded))
-                Image(systemName: "forward.fill")
-                    .font(.system(size: 10))
+        VStack(spacing: 10) {
+            // Activity chips row
+            HStack(spacing: 8) {
+                ForEach(["Stretch", "Hydrate", "Walk", "Breathe"], id: \.self) { activity in
+                    let isSelected = pomodoroManager.breakActivity == activity
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.18)) {
+                            if pomodoroManager.isRunning && pomodoroManager.sessionType == .breakTime {
+                                pomodoroManager.breakActivity = activity
+                                if pomodoroManager.breakSessionStart == nil {
+                                    pomodoroManager.breakSessionStart = Date()
+                                }
+                            } else {
+                                pomodoroManager.startBreakWithActivity(activity)
+                            }
+                        }
+                    } label: {
+                        Text(activity)
+                            .font(.system(size: 10, weight: .bold, design: .rounded))
+                            .foregroundColor(isSelected ? .orange : .white.opacity(0.55))
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(isSelected ? Color.orange.opacity(0.2) : Color.black.opacity(0.5))
+                            .clipShape(Capsule())
+                            .overlay(Capsule().stroke(isSelected ? Color.orange.opacity(0.6) : Color.white.opacity(0.12), lineWidth: 1))
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .help(pomodoroManager.isRunning ? "Tag this break as: \(activity)" : "Start break: \(activity)")
+                }
             }
-            .foregroundColor(.white)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 9)
-            .background(
-                Capsule()
-                    .fill(Color.black.opacity(0.6))
-                    .overlay(Capsule().stroke(Color.white.opacity(0.15), lineWidth: 1))
-            )
+
+            // Skip Break button
+            Button(action: { pomodoroManager.skip() }) {
+                HStack(spacing: 6) {
+                    Text("Skip Break")
+                        .font(.system(size: 12, weight: .bold, design: .rounded))
+                    Image(systemName: "forward.fill")
+                        .font(.system(size: 10))
+                }
+                .foregroundColor(.white)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 9)
+                .background(
+                    Capsule()
+                        .fill(Color.black.opacity(0.6))
+                        .overlay(Capsule().stroke(Color.white.opacity(0.15), lineWidth: 1))
+                )
+            }
+            .buttonStyle(PlainButtonStyle())
         }
-        .buttonStyle(PlainButtonStyle())
     }
 }
 
@@ -384,61 +430,89 @@ struct BreakTimerOverlay: View {
     @State private var isHovering = false
 
     var body: some View {
-        HStack(spacing: 12) {
-            // A glowing orange dot indicating active state
-            Circle()
-                .fill(Color.orange)
-                .frame(width: 8, height: 8)
-                .shadow(color: .orange.opacity(0.6), radius: 4)
-                .opacity(isPulsing ? 0.3 : 1.0)
-                .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: isPulsing)
-            
-            VStack(alignment: .leading, spacing: 1) {
-                HStack(spacing: 6) {
-                    Text("REST TIME")
-                        .font(.system(size: 8, weight: .black, design: .rounded))
-                        .foregroundColor(.orange)
-                        .tracking(1.5)
-                        .fixedSize(horizontal: true, vertical: false)
-                    
-                    if isHovering {
-                        HStack(spacing: 4) {
-                            Button(action: {
-                                scale = max(0.65, scale - 0.1)
-                            }) {
-                                Image(systemName: "minus")
-                                    .font(.system(size: 8, weight: .bold))
-                                    .foregroundColor(.white.opacity(0.7))
-                            }
-                            .buttonStyle(PlainButtonStyle())
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 12) {
+                // A glowing orange dot indicating active state
+                Circle()
+                    .fill(Color.orange)
+                    .frame(width: 8, height: 8)
+                    .shadow(color: .orange.opacity(0.6), radius: 4)
+                    .opacity(isPulsing ? 0.3 : 1.0)
+                    .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: isPulsing)
+                
+                VStack(alignment: .leading, spacing: 1) {
+                    HStack(spacing: 6) {
+                        Text(pomodoroManager.breakActivity.isEmpty ? "REST TIME" : pomodoroManager.breakActivity.uppercased() + " BREAK")
+                            .font(.system(size: 8, weight: .black, design: .rounded))
+                            .foregroundColor(.orange)
+                            .tracking(1.5)
+                            .fixedSize(horizontal: true, vertical: false)
+                        
+                        if isHovering {
+                            HStack(spacing: 4) {
+                                Button(action: {
+                                    scale = max(0.65, scale - 0.1)
+                                }) {
+                                    Image(systemName: "minus")
+                                        .font(.system(size: 8, weight: .bold))
+                                        .foregroundColor(.white.opacity(0.7))
+                                }
+                                .buttonStyle(PlainButtonStyle())
 
-                            Button(action: {
-                                scale = min(1.8, scale + 0.1)
-                            }) {
-                                Image(systemName: "plus")
-                                    .font(.system(size: 8, weight: .bold))
-                                    .foregroundColor(.white.opacity(0.7))
+                                Button(action: {
+                                    scale = min(1.8, scale + 0.1)
+                                }) {
+                                    Image(systemName: "plus")
+                                        .font(.system(size: 8, weight: .bold))
+                                        .foregroundColor(.white.opacity(0.7))
+                                }
+                                .buttonStyle(PlainButtonStyle())
                             }
-                            .buttonStyle(PlainButtonStyle())
+                            .transition(.opacity)
                         }
-                        .transition(.opacity)
                     }
-                }
 
-                Text(pomodoroManager.timeString)
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
-                    .monospacedDigit()
-                    .fixedSize(horizontal: true, vertical: false)
+                    Text(pomodoroManager.timeString)
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                        .monospacedDigit()
+                        .fixedSize(horizontal: true, vertical: false)
+                }
+            }
+
+            // Activity chips
+            HStack(spacing: 6) {
+                ForEach(["Stretch", "Hydrate", "Walk", "Breathe"], id: \.self) { activity in
+                    let isSelected = pomodoroManager.breakActivity == activity
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.18)) {
+                            pomodoroManager.breakActivity = activity
+                            if pomodoroManager.breakSessionStart == nil {
+                                pomodoroManager.breakSessionStart = Date()
+                            }
+                        }
+                    } label: {
+                        Text(activity)
+                            .font(.system(size: 8, weight: .bold, design: .rounded))
+                            .foregroundColor(isSelected ? .orange : .white.opacity(0.4))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(isSelected ? Color.orange.opacity(0.2) : Color.white.opacity(0.06))
+                            .clipShape(Capsule())
+                            .overlay(Capsule().stroke(isSelected ? Color.orange.opacity(0.5) : Color.clear, lineWidth: 1))
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .help("Tag this break as: \(activity)")
+                }
             }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
         .background {
             ZStack {
-                Capsule()
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .fill(Color.black.opacity(0.85))
-                Capsule()
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .stroke(LinearGradient(colors: [.orange.opacity(0.4), .clear], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
             }
         }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0126A1B5E33EB6BEA194F6FB /* cleancat_safari.mov in Resources */ = {isa = PBXBuildFile; fileRef = 75234A73BD095D23BD7D143F /* cleancat_safari.mov */; };
 		048040C9FBEC00B81EBC84E3 /* FatCatPomodoro.png in Resources */ = {isa = PBXBuildFile; fileRef = 307F6CF0DA98F37B2484353F /* FatCatPomodoro.png */; };
 		04A3847E94E9C214ADF44AD5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2D622D2297642149D28C78B3 /* Assets.xcassets */; };
 		0550010537B30B9F894E3FD7 /* IslandWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A22B0A8A4530AE0D837431E /* IslandWindow.swift */; };
@@ -22,7 +23,6 @@
 		87B5128D1E9F19F12016ACCD /* JarviManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E77355591CD4EB2D54E99E0B /* JarviManager.swift */; };
 		88A030C03548011B13DCB0C2 /* CalendarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C4F4D2087F3B62B62CAEE8E /* CalendarManager.swift */; };
 		8A03926F61664AE53DF4E8FD /* IslandApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7886602B476919F5DDF7AF9 /* IslandApp.swift */; };
-		8E7CE494A18EB3763CAC7C97 /* cleancat.mov in Resources */ = {isa = PBXBuildFile; fileRef = FD397FD2A85D3BFD08CFF9B9 /* cleancat.mov */; };
 		A60B82101282B00FB2D341C5 /* face_cat.png in Resources */ = {isa = PBXBuildFile; fileRef = E8C3938410DDA599A8500A48 /* face_cat.png */; };
 		BD5516CB213C6D6208EB71C4 /* MusicManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F04F6B27857427ADCBE682 /* MusicManager.swift */; };
 		DBB7DA394124D8CF3D918435 /* PomodoroHistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB865F42C61E88E0BE5FE920 /* PomodoroHistoryManager.swift */; };
@@ -43,6 +43,7 @@
 		3CCD5B3FDA2554BAD351E52D /* PomodoroManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroManager.swift; sourceTree = "<group>"; };
 		4E20FC9D363525DBD639E468 /* FatCatPomodoro.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = FatCatPomodoro.icns; sourceTree = "<group>"; };
 		55B6A920A53CC077B4F31671 /* FatCatPomodoro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FatCatPomodoro.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		75234A73BD095D23BD7D143F /* cleancat_safari.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = cleancat_safari.mov; sourceTree = "<group>"; };
 		75A0ADE9D13D72676858658B /* ScoreComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreComponents.swift; sourceTree = "<group>"; };
 		92B134928F0CEBC9159EE686 /* HorizontalDialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalDialView.swift; sourceTree = "<group>"; };
 		993DA40AEA4D90ACF1AECB95 /* FatCatPomodoro.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FatCatPomodoro.entitlements; sourceTree = "<group>"; };
@@ -59,7 +60,6 @@
 		F8F04F6B27857427ADCBE682 /* MusicManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicManager.swift; sourceTree = "<group>"; };
 		FA23ED5FB2DF87CD9D8E92E9 /* face_cat.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = face_cat.icns; sourceTree = "<group>"; };
 		FCA4C414B16FC2823FFAC70A /* cleancat.mp4 */ = {isa = PBXFileReference; path = cleancat.mp4; sourceTree = "<group>"; };
-		FD397FD2A85D3BFD08CFF9B9 /* cleancat.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = cleancat.mov; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -82,7 +82,7 @@
 		7856C2C375E4990E7311519F /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				FD397FD2A85D3BFD08CFF9B9 /* cleancat.mov */,
+				75234A73BD095D23BD7D143F /* cleancat_safari.mov */,
 				FCA4C414B16FC2823FFAC70A /* cleancat.mp4 */,
 				FA23ED5FB2DF87CD9D8E92E9 /* face_cat.icns */,
 				E8C3938410DDA599A8500A48 /* face_cat.png */,
@@ -159,7 +159,7 @@
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					59A39EC80D22F672920C73E2 = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = NZJ6XP9B66;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -192,8 +192,8 @@
 				F39AA9937DC664C66F8DC576 /* FatCatPomodoro.icns in Resources */,
 				048040C9FBEC00B81EBC84E3 /* FatCatPomodoro.png in Resources */,
 				4C38B3F88CCA5BAA34774E27 /* PrivacyInfo.xcprivacy in Resources */,
-				8E7CE494A18EB3763CAC7C97 /* cleancat.mov in Resources */,
 				DF91BE094D04A9485CA27DF9 /* cleancat.mp4 in Resources */,
+				0126A1B5E33EB6BEA194F6FB /* cleancat_safari.mov in Resources */,
 				E1741B636F8E7F657A2608EA /* face_cat.icns in Resources */,
 				A60B82101282B00FB2D341C5 /* face_cat.png in Resources */,
 			);
@@ -264,7 +264,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = NZJ6XP9B66;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -339,7 +339,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = NZJ6XP9B66;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;

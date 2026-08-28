@@ -1,4 +1,5 @@
 import Foundation
+import ServiceManagement
 
 class LaunchAtLoginManager: ObservableObject {
     static let shared = LaunchAtLoginManager()
@@ -10,45 +11,31 @@ class LaunchAtLoginManager: ObservableObject {
         }
     }
 
-    private let agentLabel = "com.fatcat.FatCatPomodoro"
-
-    private var plistURL: URL {
-        FileManager.default.homeDirectoryForCurrentUser
-            .appendingPathComponent("Library/LaunchAgents/\(agentLabel).plist")
-    }
-
     private init() {
-        isEnabled = FileManager.default.fileExists(atPath:
-            FileManager.default.homeDirectoryForCurrentUser
-                .appendingPathComponent("Library/LaunchAgents/com.fatcat.FatCatPomodoro.plist").path
-        )
+        if #available(macOS 13.0, *) {
+            isEnabled = SMAppService.mainApp.status == .enabled
+        } else {
+            isEnabled = false
+        }
     }
 
     private func enable() {
-        let execPath = Bundle.main.executablePath ?? ProcessInfo.processInfo.arguments[0]
-
-        let plist: [String: Any] = [
-            "Label":           agentLabel,
-            "ProgramArguments": [execPath],
-            "RunAtLoad":       true,
-            "KeepAlive":       false
-        ]
-
-        (plist as NSDictionary).write(to: plistURL, atomically: true)
-
-        run("/bin/launchctl", args: ["load", "-w", plistURL.path])
+        if #available(macOS 13.0, *) {
+            do {
+                try SMAppService.mainApp.register()
+            } catch {
+                print("Failed to enable launch at login: \(error)")
+            }
+        }
     }
 
     private func disable() {
-        run("/bin/launchctl", args: ["unload", "-w", plistURL.path])
-        try? FileManager.default.removeItem(at: plistURL)
-    }
-
-    private func run(_ path: String, args: [String]) {
-        let task = Process()
-        task.launchPath = path
-        task.arguments  = args
-        try? task.run()
-        task.waitUntilExit()
+        if #available(macOS 13.0, *) {
+            do {
+                try SMAppService.mainApp.unregister()
+            } catch {
+                print("Failed to disable launch at login: \(error)")
+            }
+        }
     }
 }
