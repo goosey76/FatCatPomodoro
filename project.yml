@@ -34,10 +34,14 @@ targets:
         NSPrincipalClass: NSApplication
         LSApplicationCategoryType: public.app-category.productivity
         ITSAppUsesNonExemptEncryption: false
+        NSCalendarsUsageDescription: "FatCatPomodoro reads your upcoming Calendar events to show what's next during focus sessions and breaks."
+        NSRemindersUsageDescription: "FatCatPomodoro reads your Reminders to show your next task during focus sessions and breaks."
     entitlements:
       path: Sources/FatCatPomodoro/FatCatPomodoro.entitlements
       properties:
         com.apple.security.app-sandbox: true
+        com.apple.security.network.client: true
+        com.apple.security.personal-information.calendars: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.fatcat.FatCatPomodoro
