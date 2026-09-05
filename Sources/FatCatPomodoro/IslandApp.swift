@@ -1,6 +1,7 @@
 import SwiftUI
 import AppKit
 import Combine
+import StoreKit
 
 @main
 struct IslandApp: App {
@@ -306,6 +307,92 @@ class DraggableOverlayWindow: NSWindow {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+    }
+}
+
+// MARK: - Purchase anchoring
+//
+// Since macOS 15.2, StoreKit attaches every purchase confirmation to a "UI
+// anchor" — a foreground-active, key-capable window. This app is .accessory
+// with a non-activating overlay panel, so no valid anchor exists and purchases
+// silently fail. The coordinator briefly shows a small titled window, promotes
+// the app to .regular so it can activate, runs purchase(confirmIn:) against
+// that window, then closes it and reverts to .accessory.
+@MainActor
+final class PurchaseCoordinator {
+    static let shared = PurchaseCoordinator()
+    private var anchorWindow: NSWindow?
+    private var purchaseInFlight = false
+
+    func purchase(_ product: Product) {
+        guard !purchaseInFlight else { return }
+        purchaseInFlight = true
+        Task {
+            await self.run(product)
+            self.purchaseInFlight = false
+        }
+    }
+
+    private func run(_ product: Product) async {
+        let win = makeAnchorWindow()
+        NSApp.setActivationPolicy(.regular)
+        NSApp.activate(ignoringOtherApps: true)
+        centerOnIslandScreen(win)
+        win.makeKeyAndOrderFront(nil)
+        do {
+            try await StoreManager.shared.purchase(product, confirmIn: win)
+        } catch {
+            print("Purchase failed: \(error)")
+        }
+        win.close()
+        anchorWindow = nil
+        NSApp.setActivationPolicy(.accessory)
+    }
+
+    // Center the anchor window on the built-in (notch) display — same screen as
+    // the island but clear of it, so Apple's purchase sheet never overlaps the
+    // expanded island and never jumps to an external monitor.
+    private func centerOnIslandScreen(_ win: NSWindow) {
+        let builtIn = NSScreen.screens.first {
+            guard let id = $0.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID else { return false }
+            return CGDisplayIsBuiltin(id) != 0
+        }
+        guard let screen = builtIn ?? NSScreen.main else { win.center(); return }
+        let f = screen.visibleFrame
+        let s = win.frame.size
+        // Slightly above center — the sheet drops downward from the anchor, so
+        // this keeps the purchase card in the upper-middle of the screen without
+        // touching the expanded island.
+        win.setFrameOrigin(NSPoint(x: f.midX - s.width / 2, y: f.midY - s.height / 2 + f.height * 0.15))
+    }
+
+    private func makeAnchorWindow() -> NSWindow {
+        if let anchorWindow { return anchorWindow }
+        // Minimal dark chrome: the window exists only as the StoreKit anchor, so
+        // it renders as a slim black strip that blends into the island above it.
+        // (Don't shrink below the titlebar height — AppKit crashes on degenerate
+        // titled-window geometry.)
+        let win = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 340, height: 64),
+            styleMask: [.titled, .closable, .fullSizeContentView],
+            backing: .buffered,
+            defer: false
+        )
+        win.title = "FatCatPomodoro"
+        win.titleVisibility = .hidden
+        win.titlebarAppearsTransparent = true
+        win.standardWindowButton(.closeButton)?.isHidden = true
+        win.standardWindowButton(.miniaturizeButton)?.isHidden = true
+        win.standardWindowButton(.zoomButton)?.isHidden = true
+        win.backgroundColor = .clear
+        win.isOpaque = false
+        win.hasShadow = false
+        win.isReleasedWhenClosed = false
+        win.contentView = NSHostingView(rootView:
+            Color.clear.frame(maxWidth: .infinity, maxHeight: .infinity).ignoresSafeArea()
+        )
+        anchorWindow = win
+        return win
     }
 }
 

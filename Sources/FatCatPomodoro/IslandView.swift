@@ -8,6 +8,7 @@ struct IslandView: View {
     @ObservedObject var pomodoroManager: PomodoroManager
     let isNotchedDisplay: Bool
     @ObservedObject private var streakManager = StreakManager.shared
+    @ObservedObject private var storeManager = StoreManager.shared
     @State private var isExpanded = false
     @State private var showExpandedContent = false
     @State private var capturedHeight: CGFloat = 295
@@ -62,6 +63,11 @@ struct IslandView: View {
     }
 
     private func snapshotExpandedHeight() -> CGFloat {
+        if !storeManager.isUnlocked {
+            // Tall enough for the full paywall: products, Restore Purchases, and
+            // the 3.1.2-required subscription disclosure + Terms/Privacy links.
+            return 350
+        }
         if pomodoroManager.isRunning || pomodoroManager.isPausedConfirming {
             if pomodoroManager.sessionType == .work {
                 // Chips are hidden during an active work session — compact height
@@ -113,11 +119,19 @@ struct IslandView: View {
                         .frame(width: dim.width, height: dim.height)
                 } else if showExpandedContent {
                     // Expanded: content starts below the notch gap, fills remaining height
-                    expandedPomodoroView
-                        .padding(.top, notchHeight)
-                        .frame(width: dim.width, height: dim.height, alignment: .top)
-                        .transition(.opacity)
-                        .animation(.easeIn(duration: 0.15), value: showExpandedContent)
+                    if storeManager.isUnlocked {
+                        expandedPomodoroView
+                            .padding(.top, notchHeight)
+                            .frame(width: dim.width, height: dim.height, alignment: .top)
+                            .transition(.opacity)
+                            .animation(.easeIn(duration: 0.15), value: showExpandedContent)
+                    } else {
+                        PaywallExpandedView(storeManager: storeManager)
+                            .padding(.top, notchHeight)
+                            .frame(width: dim.width, height: dim.height, alignment: .top)
+                            .transition(.opacity)
+                            .animation(.easeIn(duration: 0.15), value: showExpandedContent)
+                    }
                 }
                 // isExpanded && !showExpandedContent → plain black shell during animation
             }
@@ -352,36 +366,52 @@ struct IslandView: View {
     var compactPomodoroView: some View {
         HStack(spacing: 0) {
             // Left wing: show countdown when running, otherwise respect user preference
-            Group {
-                if pomodoroManager.isRunning {
-                    Text(pomodoroManager.timeString)
-                } else {
-                    switch pomodoroManager.compactClockMode {
-                    case "preset":
-                        let total = pomodoroManager.sessionType == .work ? pomodoroManager.workDuration : pomodoroManager.breakDuration
-                        Text("\(total / 60)m")
-                    case "clock":
-                        Text(currentTimeString)
-                    default:
-                        Text(displayTime)
+            if storeManager.isUnlocked {
+                Group {
+                    if pomodoroManager.isRunning {
+                        Text(pomodoroManager.timeString)
+                    } else {
+                        switch pomodoroManager.compactClockMode {
+                        case "preset":
+                            let total = pomodoroManager.sessionType == .work ? pomodoroManager.workDuration : pomodoroManager.breakDuration
+                            Text("\(total / 60)m")
+                        case "clock":
+                            Text(currentTimeString)
+                        default:
+                            Text(displayTime)
+                        }
                     }
                 }
+                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .foregroundColor(pomodoroManager.isRunning ? .orange.opacity(0.9) : .white.opacity(0.85))
+                .monospacedDigit()
+                .frame(width: 50, alignment: .center) // increased width for MM:SS
+            } else {
+                // Locked: lock icon on the left wing (mirrors "Unlock" on the right)
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                    .foregroundColor(.orange)
+                    .frame(width: 50, alignment: .center)
             }
-            .font(.system(size: 10, weight: .semibold, design: .rounded))
-            .foregroundColor(pomodoroManager.isRunning ? .orange.opacity(0.9) : .white.opacity(0.85))
-            .monospacedDigit()
-            .frame(width: 50, alignment: .center) // increased width for MM:SS
 
             Spacer() // center 230px = physical notch, stays black
 
             // Right wing: cat count
-            HStack(spacing: 3) {
-                CatIconView(emoji: streakManager.catEmoji, size: 20)
-                Text("\(pomodoroManager.completedToday)")
-                    .font(.system(size: 10, weight: .black, design: .rounded))
-                    .foregroundColor(.orange.opacity(0.9))
+            if storeManager.isUnlocked {
+                HStack(spacing: 3) {
+                    CatIconView(emoji: streakManager.catEmoji, size: 20)
+                    Text("\(pomodoroManager.completedToday)")
+                        .font(.system(size: 10, weight: .black, design: .rounded))
+                        .foregroundColor(.orange.opacity(0.9))
+                }
+                .frame(width: 45, alignment: .center)
+            } else {
+                // Locked: "Unlock" text on the right wing (mirrors the lock on the left)
+                Text("Unlock")
+                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                    .foregroundColor(.orange)
+                    .frame(width: 45, alignment: .center)
             }
-            .frame(width: 45, alignment: .center)
         }
     }
     
@@ -1113,6 +1143,16 @@ struct SettingsQuickSetupView: View {
                                         Text("Linked to Jarvi by AsIfThatWorks")
                                             .font(.system(size: 10, weight: .bold))
                                             .foregroundColor(.white.opacity(0.8))
+                                        // Always show WHICH account is paired — without
+                                        // this, a wrong/stale identity drifts unnoticed.
+                                        Text(jarviManager.jarviUserEmail.isEmpty
+                                             ? (jarviManager.jarviUserId.isEmpty
+                                                ? "⚠️ Paired but no account ID — re-pair recommended"
+                                                : "Paired as ID \(jarviManager.jarviUserId)")
+                                             : "Paired as \(jarviManager.jarviUserEmail) (ID \(jarviManager.jarviUserId))")
+                                            .font(.system(size: 9, weight: .semibold))
+                                            .foregroundColor(.orange.opacity(0.9))
+                                            .textSelection(.enabled)
                                         Text("Fully supports Google Events & Google Tasks integration with the Jarvi Chief Executor")
                                             .font(.system(size: 8, weight: .regular))
                                             .foregroundColor(.white.opacity(0.5))
@@ -1247,7 +1287,7 @@ struct SettingsQuickSetupView: View {
                     Divider().background(Color.white.opacity(0.1))
 
                     storeSection
-                    
+
                     Divider().background(Color.white.opacity(0.1))
 
                     // Advanced Settings Collapsible Button
@@ -1335,48 +1375,26 @@ struct SettingsQuickSetupView: View {
                     
                     HStack(spacing: 12) {
                         if let lifetime = storeManager.lifetimeProduct {
-                            Button(action: {
-                                Task { try? await storeManager.purchase(lifetime) }
-                            }) {
-                                VStack {
-                                    Text("Lifetime")
-                                        .font(.system(size: 11, weight: .bold))
-                                    Text(lifetime.displayPrice)
-                                        .font(.system(size: 9))
-                                }
-                                .padding(.vertical, 8)
-                                .frame(maxWidth: .infinity)
-                                .background(Color.orange.opacity(0.2))
-                                .cornerRadius(6)
+                            PaywallProductButton(title: "Lifetime", price: lifetime.displayPrice, tint: .orange) {
+                                PurchaseCoordinator.shared.purchase(lifetime)
                             }
-                            .buttonStyle(PlainButtonStyle())
                         }
-                        
                         if let monthly = storeManager.monthlyProduct {
-                            Button(action: {
-                                Task { try? await storeManager.purchase(monthly) }
-                            }) {
-                                VStack {
-                                    Text("Monthly")
-                                        .font(.system(size: 11, weight: .bold))
-                                    Text(monthly.displayPrice)
-                                        .font(.system(size: 9))
-                                }
-                                .padding(.vertical, 8)
-                                .frame(maxWidth: .infinity)
-                                .background(Color.blue.opacity(0.2))
-                                .cornerRadius(6)
+                            PaywallProductButton(title: "Monthly", price: monthly.displayPrice, tint: .blue) {
+                                PurchaseCoordinator.shared.purchase(monthly)
                             }
-                            .buttonStyle(PlainButtonStyle())
                         }
                     }
-                    
+
                     Button("Restore Purchases") {
                         Task { await storeManager.restorePurchases() }
                     }
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundColor(.white.opacity(0.5))
                     .padding(.top, 4)
+
+                    SubscriptionLegalView(monthlyPrice: storeManager.monthlyProduct?.displayPrice)
+                        .padding(.top, 6)
                 }
                 .padding()
                 .background(Color.white.opacity(0.04))
@@ -1384,7 +1402,7 @@ struct SettingsQuickSetupView: View {
             }
         }
     }
-
+    
     private var advancedSettingsContent: some View {
         VStack(spacing: 16) {
             coreTogglesSection
@@ -1734,5 +1752,119 @@ struct NotchShape: Shape {
                  radius: r, startAngle: .degrees(90), endAngle: .degrees(180), clockwise: false)
         p.closeSubpath()
         return p
+    }
+}
+
+struct PaywallExpandedView: View {
+    @ObservedObject var storeManager: StoreManager
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "lock.fill")
+                .font(.system(size: 28))
+                .foregroundColor(.orange)
+
+            VStack(spacing: 4) {
+                Text("Unlock FatCatPomodoro")
+                    .font(.system(size: 16, weight: .black, design: .rounded))
+                    .foregroundColor(.white)
+                Text("Support development to unlock the core timer features.")
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundColor(.white.opacity(0.7))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 20)
+            }
+
+            // Purchases must anchor to a real key window (macOS 15.2+ StoreKit
+            // requirement) — PurchaseCoordinator handles that; these buttons stay
+            // in the island's own style.
+            HStack(spacing: 16) {
+                if let lifetime = storeManager.lifetimeProduct {
+                    PaywallProductButton(title: "Lifetime", price: lifetime.displayPrice, tint: .orange) {
+                        PurchaseCoordinator.shared.purchase(lifetime)
+                    }
+                }
+                if let monthly = storeManager.monthlyProduct {
+                    PaywallProductButton(title: "Monthly", price: monthly.displayPrice, tint: .blue) {
+                        PurchaseCoordinator.shared.purchase(monthly)
+                    }
+                }
+            }
+            .padding(.top, 4)
+
+            Button("Restore Purchases") {
+                Task { await storeManager.restorePurchases() }
+            }
+            .font(.system(size: 10, weight: .semibold))
+            .foregroundColor(.white.opacity(0.7))
+            .buttonStyle(PlainButtonStyle())
+
+            SubscriptionLegalView(monthlyPrice: storeManager.monthlyProduct?.displayPrice)
+                .padding(.top, 8)
+        }
+        .padding(.top, 16)
+        .padding(.bottom, 24)
+        .frame(width: 480)
+    }
+}
+
+/// A paywall product button in the island's own dark style — kept bright enough
+/// to read on the black background.
+struct PaywallProductButton: View {
+    let title: String
+    let price: String
+    let tint: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 2) {
+                Text(title)
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.white)
+                Text(price)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(.white.opacity(0.85))
+            }
+            .padding(.vertical, 10)
+            .frame(width: 120)
+            .background(tint.opacity(0.35))
+            .cornerRadius(8)
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(tint.opacity(0.7), lineWidth: 1))
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
+
+/// Auto-renewable subscription disclosure + Terms of Use / Privacy Policy links.
+/// Required by App Store Review Guideline 3.1.2 wherever the subscription can be purchased.
+struct SubscriptionLegalView: View {
+    let monthlyPrice: String?
+
+    private let termsURL = URL(string: "https://asifthatworks.com/terms-of-service.html")!
+    private let privacyURL = URL(string: "https://asifthatworks.com/privacy-policy.html")!
+
+    var body: some View {
+        VStack(spacing: 6) {
+            Text(disclosureText)
+                .font(.system(size: 9))
+                .foregroundColor(.white.opacity(0.6))
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+
+            HStack(spacing: 8) {
+                Link("Terms of Use", destination: termsURL)
+                Text("•").foregroundColor(.white.opacity(0.4))
+                Link("Privacy Policy", destination: privacyURL)
+            }
+            .font(.system(size: 10, weight: .semibold))
+            .foregroundColor(.white.opacity(0.8))
+        }
+        .padding(.horizontal, 16)
+    }
+
+    private var disclosureText: String {
+        let price = monthlyPrice ?? "the listed price"
+        return "Monthly Support is an auto-renewable subscription at \(price) per month. Your Apple Account is charged at confirmation of purchase and renews automatically each month unless canceled at least 24 hours before the end of the current period. Manage or cancel anytime in System Settings › Apple Account › Media & Purchases."
     }
 }

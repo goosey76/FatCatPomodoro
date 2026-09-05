@@ -33,7 +33,7 @@ class PomodoroManager: ObservableObject {
     @AppStorage("pomodoro.strictModeEnabled") var strictModeEnabled: Bool = false
     @AppStorage("pomodoro.targetCalendarID") var targetCalendarID: String = ""
     @AppStorage("pomodoro.calendarSource") var calendarSource: String = "mac"
-    @AppStorage("pomodoro.todoSource") var todoSource: String = "jarvi" {
+    @AppStorage("pomodoro.todoSource") var todoSource: String = "reminders" {
         didSet { fetchReminders() }
     }
     @AppStorage("pomodoro.targetTodoList") var targetTodoList: String = "" {

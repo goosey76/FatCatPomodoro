@@ -15,3 +15,6 @@ Package.resolved
 *.xcworkspace/xcuserdata/
 xcuserdata/
 build/
+
+build_mas/
+build/

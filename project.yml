@@ -7,6 +7,10 @@ options:
   groupSortPosition: top
   generateEmptyDirectories: true
 
+configs:
+  Debug: debug
+  Release: release
+
 settings:
   base:
     SWIFT_VERSION: "5.9"
@@ -15,8 +19,8 @@ settings:
     CODE_SIGN_STYLE: Automatic
     DEVELOPMENT_TEAM: "NZJ6XP9B66"
 
-targets:
-  FatCatPomodoro:
+targetTemplates:
+  AppBase:
     type: application
     platform: macOS
     sources:
@@ -34,17 +38,42 @@ targets:
         NSPrincipalClass: NSApplication
         LSApplicationCategoryType: public.app-category.productivity
         ITSAppUsesNonExemptEncryption: false
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        NSCalendarsFullAccessUsageDescription: "FatCatPomodoro logs your completed focus sessions to a calendar you choose and shows your upcoming events as quick-start focus suggestions."
+        NSCalendarsUsageDescription: "FatCatPomodoro logs your completed focus sessions to a calendar you choose and shows your upcoming events as quick-start focus suggestions."
+        NSRemindersFullAccessUsageDescription: "FatCatPomodoro reads your reminders to suggest tasks you can focus on and can mark them complete when a focus session ends."
+        NSRemindersUsageDescription: "FatCatPomodoro reads your reminders to suggest tasks you can focus on and can mark them complete when a focus session ends."
     entitlements:
       path: Sources/FatCatPomodoro/FatCatPomodoro.entitlements
       properties:
         com.apple.security.app-sandbox: true
+        com.apple.security.network.client: true
+        # Covers both Calendar and Reminders EventKit access on macOS —
+        # there is no separate ".reminders" sandbox entitlement (iOS-only key,
+        # rejected by App Store validation).
+        com.apple.security.personal-information.calendars: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.fatcat.FatCatPomodoro
         PRODUCT_NAME: FatCatPomodoro
         MARKETING_VERSION: "1.0"
-        CURRENT_PROJECT_VERSION: "4"
+        CURRENT_PROJECT_VERSION: "6"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CODE_SIGN_ENTITLEMENTS: Sources/FatCatPomodoro/FatCatPomodoro.entitlements
         INFOPLIST_FILE: Sources/FatCatPomodoro/Info.plist
         LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/../Frameworks"
+
+schemes:
+  FatCatPomodoro:
+    build:
+      targets:
+        FatCatPomodoro: all
+    run:
+      config: Debug
+      storeKitConfiguration: Sources/FatCatPomodoro/StoreConfiguration.storekit
+    archive:
+      config: Release
+targets:
+  FatCatPomodoro:
+    templates: [AppBase]

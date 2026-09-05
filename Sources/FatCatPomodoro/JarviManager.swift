@@ -26,7 +26,10 @@ class JarviManager: ObservableObject {
             }
         }
     }
-    @Published var jarviUserId: String = "1722681533" {
+    // Empty until pairing supplies the real identity. Never default this to a
+    // real ID — a hardcoded fallback silently routed unpaired installs onto the
+    // wrong Jarvi account.
+    @Published var jarviUserId: String = "" {
         didSet {
             UserDefaults.standard.set(jarviUserId, forKey: "jarvi_user_id")
             if isLinked {
@@ -36,6 +39,11 @@ class JarviManager: ObservableObject {
                 }
             }
         }
+    }
+    /// Email of the paired Jarvi account, when the pairing response provides it.
+    /// Shown in Settings so the user can always see which account is linked.
+    @Published var jarviUserEmail: String = "" {
+        didSet { UserDefaults.standard.set(jarviUserEmail, forKey: "jarvi_user_email") }
     }
     
     private let baseURL = "https://asifthatworks.com/api/v1"
@@ -143,6 +151,9 @@ class JarviManager: ObservableObject {
         if let savedUserId = UserDefaults.standard.string(forKey: "jarvi_user_id"), !savedUserId.isEmpty {
             self.jarviUserId = savedUserId
         }
+        if let savedEmail = UserDefaults.standard.string(forKey: "jarvi_user_email"), !savedEmail.isEmpty {
+            self.jarviUserEmail = savedEmail
+        }
         if let savedToken = loadTokenFromKeychain() {
             self.jarviToken = savedToken
             self.isLinked = !savedToken.isEmpty
@@ -159,7 +170,11 @@ class JarviManager: ObservableObject {
     private func applyAuthHeaders(to request: inout URLRequest) {
         request.setValue("Bearer \(jarviToken)", forHTTPHeaderField: "Authorization")
         request.setValue(jarviToken, forHTTPHeaderField: "X-API-Key")
-        request.setValue(jarviUserId, forHTTPHeaderField: "X-User-ID")
+        // Only claim an identity we actually have — an empty X-User-ID must fail
+        // server-side rather than silently resolve to someone else's account.
+        if !jarviUserId.isEmpty {
+            request.setValue(jarviUserId, forHTTPHeaderField: "X-User-ID")
+        }
     }
     
     private func saveTokenToKeychain(_ token: String) {
@@ -267,10 +282,16 @@ class JarviManager: ObservableObject {
                     
                     if let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
                         if let token = json["token"] as? String ?? json["jarviToken"] as? String ?? json["apiKey"] as? String {
-                            if let userId = json["userId"] as? String ?? json["user_id"] as? String ?? json["telegramId"] as? String {
+                            // Prefer the explicit telegramId — a generic "userId" may
+                            // carry a Mongo _id, which the backend cannot resolve for
+                            // routing (tasks/calendar would silently fall to defaults).
+                            if let userId = json["telegramId"] as? String ?? json["userId"] as? String ?? json["user_id"] as? String {
                                 self?.jarviUserId = "\(userId)"
-                            } else if let userIdInt = json["userId"] as? Int ?? json["user_id"] as? Int ?? json["telegramId"] as? Int {
+                            } else if let userIdInt = json["telegramId"] as? Int ?? json["userId"] as? Int ?? json["user_id"] as? Int {
                                 self?.jarviUserId = "\(userIdInt)"
+                            }
+                            if let email = json["email"] as? String ?? json["userEmail"] as? String {
+                                self?.jarviUserEmail = email
                             }
                             self?.jarviToken = token
                             completion(true, nil)
@@ -326,6 +347,10 @@ class JarviManager: ObservableObject {
     
     func unlink() {
         jarviToken = ""
+        // Clear the identity too — a stale ID left behind here is how the app
+        // ends up silently acting as the wrong account after a re-pair.
+        jarviUserId = ""
+        jarviUserEmail = ""
     }
     
     // MARK: - Todos API

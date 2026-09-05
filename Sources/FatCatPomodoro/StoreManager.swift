@@ -1,5 +1,6 @@
 import Foundation
 import StoreKit
+import AppKit
 
 @MainActor
 class StoreManager: ObservableObject {
@@ -7,7 +8,11 @@ class StoreManager: ObservableObject {
 
     @Published private(set) var lifetimeProduct: Product?
     @Published private(set) var monthlyProduct: Product?
-    @Published private(set) var isUnlocked: Bool = false
+    @Published private(set) var hasActiveEntitlement: Bool = false
+    
+    var isUnlocked: Bool {
+        hasActiveEntitlement
+    }
 
     private var updateListenerTask: Task<Void, Error>? = nil
     
@@ -46,15 +51,27 @@ class StoreManager: ObservableObject {
         }
     }
 
-    func purchase(_ product: Product) async throws {
-        let result = try await product.purchase()
+    func purchase(_ product: Product, confirmIn window: NSWindow? = nil) async throws {
+        // Since macOS 15.2, StoreKit routes every purchase through a "UI anchor"
+        // lookup that needs a foreground-active key window. This app is .accessory
+        // with a non-activating overlay panel, so no valid anchor exists and the
+        // legacy purchase() silently fails. Anchoring explicitly to a real window
+        // via purchase(confirmIn:) is the documented fix.
+        let result: Product.PurchaseResult
+        if #available(macOS 15.2, *), let window {
+            result = try await product.purchase(confirmIn: window)
+        } else {
+            result = try await product.purchase()
+        }
 
         switch result {
         case .success(let verification):
             let transaction = try checkVerified(verification)
-            await updateEntitlements()
+            // Finish BEFORE querying entitlements: currentEntitlements may not
+            // report a transaction until it has been finished.
             await transaction.finish()
-            
+            await updateEntitlements()
+
             // Log to Jarvi
             let eventName = product.id == lifetimeProductId ? "IAP_PURCHASE_LIFETIME" : "IAP_PURCHASE_MONTHLY"
             JarviManager.shared.sendFatcatEvent(eventName, title: "Purchased \(product.displayName)")
@@ -75,9 +92,15 @@ class StoreManager: ObservableObject {
         }
     }
 
+    /// Public hook for SwiftUI StoreKit views (ProductView) to refresh entitlement
+    /// state immediately after they complete a purchase.
+    func refresh() async {
+        await updateEntitlements()
+    }
+
     private func updateEntitlements() async {
         var hasUnlock = false
-        
+
         for await result in Transaction.currentEntitlements {
             do {
                 let transaction = try checkVerified(result)
@@ -88,8 +111,22 @@ class StoreManager: ObservableObject {
                 print("Transaction verification failed: \(error)")
             }
         }
-        
-        isUnlocked = hasUnlock
+
+        // Fallback: currentEntitlements can lag right after a purchase (notably in
+        // the Xcode StoreKit test environment). Check the latest transaction for
+        // each product directly before concluding the user owns nothing.
+        if !hasUnlock {
+            for productId in [lifetimeProductId, monthlyProductId] {
+                guard let latest = await Transaction.latest(for: productId),
+                      case .verified(let transaction) = latest else { continue }
+                let expired = transaction.expirationDate.map { $0 <= Date() } ?? false
+                if transaction.revocationDate == nil && !expired {
+                    hasUnlock = true
+                }
+            }
+        }
+
+        hasActiveEntitlement = hasUnlock
     }
 
     private func listenForTransactions() -> Task<Void, Error> {
@@ -97,8 +134,10 @@ class StoreManager: ObservableObject {
             for await result in Transaction.updates {
                 do {
                     let transaction = try self.checkVerified(result)
-                    await self.updateEntitlements()
+                    // Finish first — currentEntitlements may not report an
+                    // unfinished transaction.
                     await transaction.finish()
+                    await self.updateEntitlements()
                 } catch {
                     print("Transaction update verification failed: \(error)")
                 }
