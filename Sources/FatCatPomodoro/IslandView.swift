@@ -18,6 +18,8 @@ struct IslandView: View {
     @Namespace private var animation
     @State private var showSettings = false
     @State private var currentTime = Date()
+    // Show the wall-clock end time next to the dialed minutes (default on).
+    @AppStorage("pomodoro.showDialTargetTime") private var showDialTargetTime = true
     @State private var displayMode: PomodoroSessionType = .work
     @State private var hoveredTask: String? = nil
     @State private var hoveredCheckmarkTask: String? = nil
@@ -60,6 +62,13 @@ struct IslandView: View {
             let total = displayMode == .work ? pomodoroManager.workDuration : pomodoroManager.breakDuration
             return "\(total / 60)m"
         }
+    }
+
+    /// Wall-clock time the session would end at with the currently dialed
+    /// minutes — what the dial is aimed at, not how long it runs.
+    private var dialTargetTimeString: String {
+        let total = displayMode == .work ? pomodoroManager.workDuration : pomodoroManager.breakDuration
+        return Self.timeFormatter.string(from: currentTime.addingTimeInterval(TimeInterval(total)))
     }
 
     private func snapshotExpandedHeight() -> CGFloat {
@@ -458,12 +467,23 @@ struct IslandView: View {
                 Spacer()
 
                 // Center: Time display (in the physical notch gap area)
-                Text(displayTime)
-                    .font(.system(size: 22, weight: .thin, design: .rounded))
-                    .foregroundColor(.white)
-                    .monospacedDigit()
-                    .frame(width: 164, alignment: .center)
-                    .padding(.top, 10)
+                VStack(spacing: 0) {
+                    Text(displayTime)
+                        .font(.system(size: 22, weight: .thin, design: .rounded))
+                        .foregroundColor(.white)
+                        .monospacedDigit()
+                    // Greyed wall-clock landing time (now + dialed minutes) so the
+                    // dial can be aimed at an exact clock time. Live: updates as
+                    // the dial moves and as the clock ticks.
+                    if showDialTargetTime && !pomodoroManager.isRunning && !pomodoroManager.isPausedConfirming {
+                        Text("→ \(dialTargetTimeString)")
+                            .font(.system(size: 9, weight: .semibold, design: .rounded))
+                            .foregroundColor(.white.opacity(0.35))
+                            .monospacedDigit()
+                    }
+                }
+                .frame(width: 164, alignment: .center)
+                .padding(.top, 4)
 
                 Spacer()
 
@@ -1000,6 +1020,8 @@ struct SettingsQuickSetupView: View {
     @State private var isPairingPin: Bool = false
     @State private var pinError: String? = nil
     @State private var showAdvancedSettings: Bool = false
+    // Same key IslandView reads to render the greyed end-time preview.
+    @AppStorage("pomodoro.showDialTargetTime") private var showDialTargetTime = true
     
     var body: some View {
         VStack(spacing: 0) {
@@ -1138,7 +1160,11 @@ struct SettingsQuickSetupView: View {
                         if jarviManager.isLinked {
                             HStack {
                                 HStack(spacing: 4) {
-                                    Circle().fill(Color.green).frame(width: 6, height: 6)
+                                    // Green only while the server actually accepts our
+                                    // session — a rejected token must not look healthy.
+                                    Circle()
+                                        .fill(jarviManager.authErrorMessage == nil ? Color.green : Color.red)
+                                        .frame(width: 6, height: 6)
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text("Linked to Jarvi by AsIfThatWorks")
                                             .font(.system(size: 10, weight: .bold))
@@ -1153,9 +1179,16 @@ struct SettingsQuickSetupView: View {
                                             .font(.system(size: 9, weight: .semibold))
                                             .foregroundColor(.orange.opacity(0.9))
                                             .textSelection(.enabled)
-                                        Text("Fully supports Google Events & Google Tasks integration with the Jarvi Chief Executor")
-                                            .font(.system(size: 8, weight: .regular))
-                                            .foregroundColor(.white.opacity(0.5))
+                                        if let authError = jarviManager.authErrorMessage {
+                                            Text("⚠️ \(authError)")
+                                                .font(.system(size: 9, weight: .semibold))
+                                                .foregroundColor(.red.opacity(0.9))
+                                                .textSelection(.enabled)
+                                        } else {
+                                            Text("Fully supports Google Events & Google Tasks integration with the Jarvi Chief Executor")
+                                                .font(.system(size: 8, weight: .regular))
+                                                .foregroundColor(.white.opacity(0.5))
+                                        }
                                     }
                                 }
                                 Spacer()
@@ -1181,7 +1214,7 @@ struct SettingsQuickSetupView: View {
                                         .font(.system(size: 10))
                                         .foregroundColor(.white.opacity(0.5))
                                     Spacer()
-                                    Button("⚡ Get PIN (/pair in Telegram)") {
+                                    Button("⚡ Get PIN (asifthatworks.com)") {
                                         jarviManager.initiatePairing()
                                     }
                                     .buttonStyle(PlainButtonStyle())
@@ -1195,7 +1228,7 @@ struct SettingsQuickSetupView: View {
                                 
                                 // 6-Digit PIN Input Screen
                                 VStack(alignment: .leading, spacing: 6) {
-                                    Text("Enter 6-Digit PIN from Telegram /pair:")
+                                    Text("Enter the 6-digit PIN from your Jarvi web account:")
                                         .font(.system(size: 9, weight: .medium))
                                         .foregroundColor(.white.opacity(0.7))
                                     
@@ -1702,6 +1735,14 @@ struct SettingsQuickSetupView: View {
             }
             .pickerStyle(.segmented)
             .labelsHidden()
+
+            Toggle(isOn: $showDialTargetTime) {
+                Text("End time next to minutes")
+                    .font(.system(size: 10))
+                    .foregroundColor(.white.opacity(0.7))
+            }
+            .toggleStyle(OrangeToggleStyle())
+            .padding(.top, 6)
         }
     }
 }

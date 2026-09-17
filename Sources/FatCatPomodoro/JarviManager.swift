@@ -15,6 +15,8 @@ class JarviManager: ObservableObject {
             isLinked = !jarviToken.isEmpty
             saveTokenToKeychain(jarviToken)
             DispatchQueue.main.async {
+                // New credentials, clean slate — the next fetch re-evaluates.
+                self.authErrorMessage = nil
                 if self.isLinked {
                     self.startCommandPolling()
                 } else {
@@ -45,6 +47,11 @@ class JarviManager: ObservableObject {
     @Published var jarviUserEmail: String = "" {
         didSet { UserDefaults.standard.set(jarviUserEmail, forKey: "jarvi_user_email") }
     }
+    /// Set when the server rejects our credentials (401/403) on a data fetch.
+    /// A non-empty token is not proof of a working session — the backend can
+    /// deprecate a token format after pairing, leaving the app "linked" but
+    /// unable to pull anything.
+    @Published var authErrorMessage: String? = nil
     
     private let baseURL = "https://asifthatworks.com/api/v1"
     private let keychainService = "com.fatcat.jarvi"
@@ -176,6 +183,41 @@ class JarviManager: ObservableObject {
             request.setValue(jarviUserId, forHTTPHeaderField: "X-User-ID")
         }
     }
+
+    /// Pull the unique account id out of a server response. Only the canonical
+    /// web-account id counts — messenger ids (Telegram/WhatsApp/Messenger/
+    /// Instagram) are channels hanging off that account and are never accepted
+    /// as identity. Bare "id" is deliberately excluded — in pairing responses
+    /// it can name the pairing record rather than the account.
+    static func extractAccountId(from json: [String: Any]) -> String? {
+        let idKeys = ["userId", "user_id", "accountId", "account_id", "webId", "web_id"]
+        for key in idKeys {
+            if let str = json[key] as? String, !str.isEmpty { return str }
+            if let int = json[key] as? Int { return "\(int)" }
+        }
+        return nil
+    }
+
+    /// Record whether the server accepted our credentials on a data fetch.
+    /// Prefers the server's own message (e.g. "This pairing token format is
+    /// deprecated…") so the user sees the real reason, not a generic failure.
+    private func recordAuthResult(response: URLResponse?, data: Data?) {
+        guard let http = response as? HTTPURLResponse else { return }
+        DispatchQueue.main.async {
+            if http.statusCode == 401 || http.statusCode == 403 {
+                var message = "Session rejected by server — please disconnect and re-pair"
+                if let data = data,
+                   let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                   let serverMsg = json["message"] as? String ?? json["error"] as? String,
+                   !serverMsg.isEmpty {
+                    message = serverMsg
+                }
+                self.authErrorMessage = message
+            } else if (200...299).contains(http.statusCode) {
+                self.authErrorMessage = nil
+            }
+        }
+    }
     
     private func saveTokenToKeychain(_ token: String) {
         let data = token.data(using: .utf8)!
@@ -282,13 +324,11 @@ class JarviManager: ObservableObject {
                     
                     if let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
                         if let token = json["token"] as? String ?? json["jarviToken"] as? String ?? json["apiKey"] as? String {
-                            // Prefer the explicit telegramId — a generic "userId" may
-                            // carry a Mongo _id, which the backend cannot resolve for
-                            // routing (tasks/calendar would silently fall to defaults).
-                            if let userId = json["telegramId"] as? String ?? json["userId"] as? String ?? json["user_id"] as? String {
-                                self?.jarviUserId = "\(userId)"
-                            } else if let userIdInt = json["telegramId"] as? Int ?? json["userId"] as? Int ?? json["user_id"] as? Int {
-                                self?.jarviUserId = "\(userIdInt)"
+                            // Identity is the canonical web-account id, full
+                            // stop. If the server only sends a messenger id,
+                            // we store no identity and the panel flags it.
+                            if let userId = JarviManager.extractAccountId(from: json) {
+                                self?.jarviUserId = userId
                             }
                             if let email = json["email"] as? String ?? json["userEmail"] as? String {
                                 self?.jarviUserEmail = email
@@ -351,6 +391,7 @@ class JarviManager: ObservableObject {
         // ends up silently acting as the wrong account after a re-pair.
         jarviUserId = ""
         jarviUserEmail = ""
+        authErrorMessage = nil
     }
     
     // MARK: - Todos API
@@ -398,6 +439,7 @@ class JarviManager: ObservableObject {
                 print("Jarvi fetchCalendars Error: \(error.localizedDescription)")
                 return
             }
+            self.recordAuthResult(response: response, data: data)
             if let httpResp = response as? HTTPURLResponse {
                 print("Jarvi fetchCalendars Status: \(httpResp.statusCode)")
             }
@@ -612,6 +654,7 @@ class JarviManager: ObservableObject {
                 print("Jarvi fetchTodoLists Error: \(error.localizedDescription)")
                 return
             }
+            self.recordAuthResult(response: response, data: data)
             if let httpResp = response as? HTTPURLResponse {
                 print("Jarvi fetchTodoLists Status: \(httpResp.statusCode)")
             }
@@ -675,6 +718,7 @@ class JarviManager: ObservableObject {
                 return
             }
             
+            self.recordAuthResult(response: response, data: data)
             if let httpResp = response as? HTTPURLResponse {
                 print("Jarvi fetchTodos Status: \(httpResp.statusCode)")
             }
@@ -810,6 +854,18 @@ class JarviManager: ObservableObject {
             let task = URLSession.shared.dataTask(with: request) { data, response, error in
                 DispatchQueue.main.async {
                     if let httpResp = response as? HTTPURLResponse, httpResp.statusCode == 200 {
+                        // Capture the account identity from the response too —
+                        // identity before token, so the fetches the token
+                        // triggers already carry it.
+                        if let data = data,
+                           let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                            if let userId = JarviManager.extractAccountId(from: json) {
+                                self.jarviUserId = userId
+                            }
+                            if let email = json["email"] as? String ?? json["userEmail"] as? String {
+                                self.jarviUserEmail = email
+                            }
+                        }
                         self.jarviToken = token
                         print("Jarvi by AsIfThatWorks: Successfully connected device.")
                     } else {
