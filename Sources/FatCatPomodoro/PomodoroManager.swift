@@ -32,6 +32,15 @@ class PomodoroManager: ObservableObject {
     }
     @AppStorage("pomodoro.strictModeEnabled") var strictModeEnabled: Bool = false
     @AppStorage("pomodoro.targetCalendarID") var targetCalendarID: String = ""
+    // Calendar for break events. The sentinel means "follow the flow calendar"
+    // (the default); "" means the provider's primary/default calendar — same
+    // convention targetCalendarID uses, so the two pickers stay symmetric.
+    static let breakCalendarFollowsFlow = "__same_as_flow__"
+    @AppStorage("pomodoro.breakCalendarID") var breakCalendarID: String = PomodoroManager.breakCalendarFollowsFlow
+
+    var effectiveBreakCalendarID: String {
+        breakCalendarID == Self.breakCalendarFollowsFlow ? targetCalendarID : breakCalendarID
+    }
     @AppStorage("pomodoro.calendarSource") var calendarSource: String = "mac"
     @AppStorage("pomodoro.todoSource") var todoSource: String = "reminders" {
         didSet { fetchReminders() }
@@ -629,11 +638,12 @@ class PomodoroManager: ObservableObject {
         let breakStart = breakSessionStart ?? breakEnd.addingTimeInterval(-Double(breakDuration))
         let activityTitle = breakActivity.isEmpty ? "Break" : "\(breakActivity) Break"
         if !breakActivity.isEmpty {
-            let cleanCalendarId = targetCalendarID.isEmpty ? "primary" : targetCalendarID
+            let breakCalId = effectiveBreakCalendarID
+            let cleanCalendarId = breakCalId.isEmpty ? "primary" : breakCalId
             if calendarSource == "jarvi" || calendarSource == "google" {
                 JarviManager.shared.addGoogleCalendarEvent(title: activityTitle, startDate: breakStart, endDate: breakEnd, calendarId: cleanCalendarId)
             } else {
-                CalendarManager.shared.addEvent(title: activityTitle, startDate: breakStart, endDate: breakEnd, calendarIdentifier: targetCalendarID)
+                CalendarManager.shared.addEvent(title: activityTitle, startDate: breakStart, endDate: breakEnd, calendarIdentifier: breakCalId)
             }
         }
         breakActivity = ""

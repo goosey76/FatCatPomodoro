@@ -1364,6 +1364,7 @@ struct SettingsQuickSetupView: View {
         }
         .onChange(of: pomodoroManager.calendarSource) { oldVal, newVal in
             pomodoroManager.targetCalendarID = "" // Reset calendar selection when switching provider
+            pomodoroManager.breakCalendarID = PomodoroManager.breakCalendarFollowsFlow // old provider's ids don't exist on the new one
             if newVal == "jarvi" && jarviManager.isLinked {
                 jarviManager.fetchCalendars()
             } else if newVal == "mac" {
@@ -1615,6 +1616,38 @@ struct SettingsQuickSetupView: View {
                         .foregroundColor(.orange)
                     }
                 }
+            }
+
+            // Break events get their own calendar — following the flow
+            // calendar by default, overridable to taste.
+            HStack {
+                Text("Break events:")
+                    .font(.system(size: 10))
+                    .foregroundColor(.white.opacity(0.7))
+                if pomodoroManager.calendarSource == "mac" {
+                    Picker("", selection: $pomodoroManager.breakCalendarID) {
+                        Text("Same as flow").tag(PomodoroManager.breakCalendarFollowsFlow)
+                        Text("Default Calendar").tag("")
+                        ForEach(calendarManager.availableCalendars, id: \.calendarIdentifier) { calendar in
+                            Text(calendar.title).tag(calendar.calendarIdentifier)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .labelsHidden()
+                    .font(.system(size: 10))
+                } else {
+                    Picker("", selection: $pomodoroManager.breakCalendarID) {
+                        Text("Same as flow").tag(PomodoroManager.breakCalendarFollowsFlow)
+                        Text("Primary Google Calendar").tag("")
+                        ForEach(jarviManager.availableCalendars, id: \.id) { cal in
+                            Text(cal.title).tag(cal.id)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .labelsHidden()
+                    .font(.system(size: 10))
+                }
+                Spacer()
             }
         }
     }
