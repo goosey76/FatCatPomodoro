@@ -107,6 +107,7 @@ class PomodoroManager: ObservableObject {
 
         observeMidnight()
         setupJarviRemoteObserver()
+        setupAwayAutoPause()
         
         if enableReminders || JarviManager.shared.isLinked {
             fetchReminders()
@@ -399,6 +400,52 @@ class PomodoroManager: ObservableObject {
             }
     }
     
+    // MARK: - Away = paused (screen lock / system sleep)
+
+    /// True while a flow session is paused because the user left (lock/sleep),
+    /// so we know to resume on unlock/wake. Never set by a manual pause.
+    private var autoPausedWhileAway = false
+    /// Tracked via lock/unlock notifications — didWake alone can't tell whether
+    /// the screen is still locked after opening the lid.
+    private var screenLocked = false
+
+    private func setupAwayAutoPause() {
+        let lockCenter = DistributedNotificationCenter.default()
+        lockCenter.addObserver(forName: NSNotification.Name("com.apple.screenIsLocked"), object: nil, queue: .main) { [weak self] _ in
+            self?.screenLocked = true
+            self?.userWentAway()
+        }
+        lockCenter.addObserver(forName: NSNotification.Name("com.apple.screenIsUnlocked"), object: nil, queue: .main) { [weak self] _ in
+            self?.screenLocked = false
+            self?.userCameBack()
+        }
+        let workspaceCenter = NSWorkspace.shared.notificationCenter
+        workspaceCenter.addObserver(forName: NSWorkspace.willSleepNotification, object: nil, queue: .main) { [weak self] _ in
+            self?.userWentAway()
+        }
+        workspaceCenter.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) { [weak self] _ in
+            // Lid open without a lock screen resumes here; with one, resume
+            // waits for the unlock notification instead.
+            guard let self = self, !self.screenLocked else { return }
+            self.userCameBack()
+        }
+    }
+
+    private func userWentAway() {
+        // Only flow sessions pause — being away from the Mac IS the break, so
+        // the break countdown keeps running.
+        guard isRunning, sessionType == .work else { return }
+        autoPausedWhileAway = true
+        pause()
+    }
+
+    private func userCameBack() {
+        guard autoPausedWhileAway else { return }
+        autoPausedWhileAway = false
+        // Same path as the play button, so Jarvi events and DND stay in sync.
+        start()
+    }
+
     // silent=true for internal stops (completeSession, startWorkSession) — no outbound event.
     func pause(_ silent: Bool = false) {
         if isRunning && !silent {
