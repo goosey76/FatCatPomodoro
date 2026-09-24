@@ -1618,36 +1618,49 @@ struct SettingsQuickSetupView: View {
                 }
             }
 
-            // Break events get their own calendar — following the flow
-            // calendar by default, overridable to taste.
-            HStack {
-                Text("Break events:")
-                    .font(.system(size: 10))
-                    .foregroundColor(.white.opacity(0.7))
-                if pomodoroManager.calendarSource == "mac" {
-                    Picker("", selection: $pomodoroManager.breakCalendarID) {
-                        Text("Same as flow").tag(PomodoroManager.breakCalendarFollowsFlow)
-                        Text("Default Calendar").tag("")
-                        ForEach(calendarManager.availableCalendars, id: \.calendarIdentifier) { calendar in
-                            Text(calendar.title).tag(calendar.calendarIdentifier)
-                        }
+            // Target break calendar: "same as flow" checkbox by default; only
+            // when unchecked does its own calendar picker appear.
+            VStack(alignment: .leading, spacing: 4) {
+                Text("TARGET BREAK CALENDAR")
+                    .font(.system(size: 9, weight: .black))
+                    .foregroundColor(.white.opacity(0.4))
+                    .padding(.top, 4)
+
+                Toggle(isOn: Binding(
+                    get: { pomodoroManager.breakCalendarID == PomodoroManager.breakCalendarFollowsFlow },
+                    set: { same in
+                        pomodoroManager.breakCalendarID = same ? PomodoroManager.breakCalendarFollowsFlow : ""
                     }
-                    .pickerStyle(.menu)
-                    .labelsHidden()
-                    .font(.system(size: 10))
-                } else {
-                    Picker("", selection: $pomodoroManager.breakCalendarID) {
-                        Text("Same as flow").tag(PomodoroManager.breakCalendarFollowsFlow)
-                        Text("Primary Google Calendar").tag("")
-                        ForEach(jarviManager.availableCalendars, id: \.id) { cal in
-                            Text(cal.title).tag(cal.id)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .labelsHidden()
-                    .font(.system(size: 10))
+                )) {
+                    Text("Same as flow calendar")
+                        .font(.system(size: 10))
+                        .foregroundColor(.white.opacity(0.7))
                 }
-                Spacer()
+                .toggleStyle(OrangeToggleStyle())
+
+                if pomodoroManager.breakCalendarID != PomodoroManager.breakCalendarFollowsFlow {
+                    if pomodoroManager.calendarSource == "mac" {
+                        Picker("", selection: $pomodoroManager.breakCalendarID) {
+                            Text("Default Calendar").tag("")
+                            ForEach(calendarManager.availableCalendars, id: \.calendarIdentifier) { calendar in
+                                Text(calendar.title).tag(calendar.calendarIdentifier)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .labelsHidden()
+                        .font(.system(size: 10))
+                    } else {
+                        Picker("", selection: $pomodoroManager.breakCalendarID) {
+                            Text("Primary Google Calendar").tag("")
+                            ForEach(jarviManager.availableCalendars, id: \.id) { cal in
+                                Text(cal.title).tag(cal.id)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .labelsHidden()
+                        .font(.system(size: 10))
+                    }
+                }
             }
         }
     }
